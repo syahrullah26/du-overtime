@@ -1,0 +1,141 @@
+<script setup lang="ts">
+import { ref, computed } from "vue";
+
+const route = useRoute();
+const isOpen = ref(false); 
+const isSidebarOpen = useState("sidebar-toggle", () => true);
+
+const isCollapsed = computed({
+  get: () => !isSidebarOpen.value,
+  set: (val) => isSidebarOpen.value = !val
+});
+
+const menus = [
+  { name: "Dashboard", to: "/", icon: "🏠" },
+  {
+    name: "Overtime Submission",
+    icon: "⏰",
+    children: [
+      { name: "Overtime", to: "/overtime", icon: "📝" },
+      { name: "View Overtime", to: "/overtime/view", icon: "📄" },
+    ],
+  },
+];
+
+const openMenu = ref<string | null>(null);
+
+const toggleMenu = (name: string) => {
+  openMenu.value = openMenu.value === name ? null : name;
+};
+
+const isActive = (path: string) =>
+  computed(() => route.path === path || route.path.startsWith(path + "/"));
+</script>
+
+<template>
+  <div
+    v-if="isOpen"
+    @click="isOpen = false"
+    class="fixed inset-0 bg-black/60 z-30 lg:hidden"
+  />
+
+  <aside
+    class="fixed top-0 left-0 h-screen z-40 bg-zinc-900 border-r border-zinc-800 flex flex-col transition-all duration-300"
+    :class="[
+      isCollapsed ? 'w-20' : 'w-64',
+      isOpen ? 'translate-x-0' : '-translate-x-full',
+      'lg:translate-x-0',
+    ]"
+  >
+    <div class="h-16 flex items-center justify-between px-4 border-b border-zinc-800">
+      <h1 v-if="!isCollapsed" class="text-lg font-bold text-white">
+        <span class="text-yellow-600">Dewa</span> Overtime
+      </h1>
+
+      <button
+        @click="isSidebarOpen = !isSidebarOpen"
+        class="hidden lg:flex text-gray-400 hover:text-white p-2 rounded-lg hover:bg-zinc-800 transition-colors"
+      >
+        {{ isSidebarOpen ? '❮' : '☰' }}
+      </button>
+
+      <button
+        @click="isOpen = false"
+        class="lg:hidden text-gray-400 hover:text-white"
+      >
+        ✕
+      </button>
+    </div>
+
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <template v-for="menu in menus" :key="menu.name">
+        <NuxtLink
+          v-if="!menu.children"
+          :to="menu.to"
+          @click="isOpen = false"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 transition-all duration-200"
+          :class="
+            isActive(menu.to).value
+              ? 'bg-yellow-400 text-white shadow-inner'
+              : 'hover:bg-yellow-600/20'
+          "
+        >
+          <span class="text-xl transition-transform duration-200 group-hover:scale-110">
+            {{ menu.icon }}
+          </span>
+          <span v-if="!isCollapsed" class="font-medium transition-colors">
+            {{ menu.name }}
+          </span>
+        </NuxtLink>
+
+        <div v-else class="space-y-1">
+          <button
+            @click="toggleMenu(menu.name)"
+            class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-300 hover:bg-yellow-600/20 transition-all"
+          >
+            <div class="flex items-center gap-3">
+              <span class="text-xl">{{ menu.icon }}</span>
+              <span v-if="!isCollapsed" class="font-medium">{{ menu.name }}</span>
+            </div>
+            <span
+              v-if="!isCollapsed"
+              class="text-[10px] transition-transform duration-300"
+              :class="openMenu === menu.name ? 'rotate-180' : ''"
+            >
+              ▼
+            </span>
+          </button>
+          
+          <div
+            v-if="openMenu === menu.name && !isCollapsed"
+            class="ml-10 mt-2 space-y-1 border-l border-zinc-700/50 pl-3"
+          >
+            <NuxtLink
+              v-for="child in menu.children"
+              :key="child.name"
+              :to="child.to"
+              class="block px-3 py-2 rounded-lg text-gray-400 text-sm hover:text-white hover:bg-yellow-600/40 transition-all"
+              :class="isActive(child.to).value ? 'text-yellow-400 font-bold' : ''"
+            >
+              {{ child.icon }} {{ child.name }}
+            </NuxtLink>
+          </div>
+        </div>
+      </template>
+    </nav>
+
+    <div class="p-4 border-t border-zinc-800 text-[10px] text-gray-500 text-center uppercase tracking-widest font-bold">
+       <span v-if="!isCollapsed">DU-OVERTIME 2026</span>
+       <span v-else>DU</span>
+    </div>
+  </aside>
+
+  <header
+    class="lg:hidden fixed top-0 left-0 right-0 h-16 bg-zinc-900 border-b border-zinc-800 flex items-center px-4 z-20"
+  >
+    <button @click="isOpen = true" class="text-gray-300 text-xl">☰</button>
+    <h1 class="ml-4 font-semibold text-white">
+      <span class="text-yellow-600 font-bold">DU</span>-Overtime
+    </h1>
+  </header>
+</template>

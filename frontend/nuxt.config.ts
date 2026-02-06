@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     port: 3001,
   },
   debug: true,
-  modules: ["@nuxtjs/tailwindcss"],
+  modules: ["@nuxtjs/tailwindcss","nuxt-icon"],
   css: ["~/assets/main.css"],
   runtimeConfig: {
     public: {

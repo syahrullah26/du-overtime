@@ -5,12 +5,9 @@ definePageMeta({
 </script>
 <template>
   <section>
-    <form @submit.prevent="handleLogin">
-      <input
-        type="text"
-        placeholder="Email"
-        class="w-full border p-2 mb-4 rounded"
-      />
+    <form>
+      <BaseInput label="Email" type="email" />
+      <BaseInput label="Password" type="password" />
       <div class="flex justify-center items-center">
         <BaseButton label="Sign In" variant="primary" type="submit" />
       </div>
