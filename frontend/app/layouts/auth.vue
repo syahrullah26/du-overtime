@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 <template>
   <main
-    class="min-h-screen bg-white-900/50 flex items-center justify-center p-4"
+    class="min-h-screen bg-[var(--white-bone)] flex items-center justify-center p-4"
   >
     <div
       class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8"

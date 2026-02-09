@@ -2,3 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --gold-main: #c5a059;
+  --gold-dark: #af8d4a;
+  --third-color: #f1d18a;
+  --white-bone: #f8f9fa;
+}

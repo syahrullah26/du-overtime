@@ -3,7 +3,7 @@
 // Jika belum, ini adalah simulasi logika pengecekan role
 const auth = {
   user: {
-    role: "EMPLOYEE", // Ini nantinya dinamis dari API NestJS/JWT
+    role: "FINANCE", // Ini nantinya dinamis dari API NestJS/JWT
   },
 };
 
@@ -40,7 +40,7 @@ onMounted(() => {
       class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[#C5A059] mb-4"
     ></div>
     <p class="text-gray-500 font-medium animate-pulse">
-      Menyiapkan Dashboard Dewa Trident...
+      Menyiapkan Dashboard Dewa Overtime...
     </p>
   </div>
 </template>

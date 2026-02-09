@@ -5,7 +5,7 @@ const isSidebarOpen = useState("sidebar-toggle", () => true);
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#F8F9FA] text-zinc-100">
+  <div class="min-h-screen bg-[var(--white-bone)] text-zinc-100">
     <sideBar />
 
     <div

@@ -14,7 +14,7 @@ defineProps<{
       v-model="model"
       :type="type || 'text'"
       :placeholder="placeholder || label"
-      class="w-full border p-2 mb-4 rounded transition-all hover:bg-gray-50 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none"
+      class="w-full border p-2 mb-4 rounded transition-all hover:bg-gray-50 focus:bg-white focus:border-[var(--gold-dark)] focus:ring-2 focus:ring-[var(--gold-main)] outline-none"
     />
   </div>
 </template>

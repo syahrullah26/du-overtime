@@ -4,15 +4,19 @@ import Stepper from "~/components/ui/Stepper.vue";
 import OvertimeTable from "~/components/ui/OvertimeTable.vue";
 import ProfileCard from "~/components/ui/ProfileCard.vue";
 const stats = [
-  { label: "Total Jam Bulan Ini", value: "32 Jam 15 Menit", icon: "🕒" },
-  { label: "Status Pengajuan", value: "2 Pending", icon: "📄" },
-  { label: "Total Lembur (Gross)", value: "Rp 1.612.500", icon: "💰" },
+  {
+    label: "Deadline Periode Bulan Ini",
+    value: "23 Hari 23:58:24",
+    icon: "🕒",
+  },
+  { label: "Jumlah Pengajuan", value: "3 Pending", icon: "📄" },
+  { label: "Total Approve", value: "25", icon: "💰" },
 ];
 
 const profile = [
   {
     userName: "Galuh Anjani Garnisaputri",
-    position: "Kiper",
+    position: "HRD Payroll",
     // imageUrl:
     //   "https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
     imageUrl: "/anjani.jpeg",
@@ -24,6 +28,7 @@ const submissions = [
     id: 1,
     date: "20 Okt 2024",
     duration: "4 Jam",
+    nama: "Galuh Anjani Garnisaputri",
     pic_status: "done",
     clevel_status: "process",
     hrd_status: "pending",
@@ -34,6 +39,7 @@ const submissions = [
     id: 2,
     date: "18 Okt 2024",
     duration: "2 Jam",
+    nama: "Galuh Anjani Garnisaputri",
     pic_status: "done",
     clevel_status: "done",
     hrd_status: "done",
@@ -44,6 +50,7 @@ const submissions = [
     id: 2,
     date: "18 Okt 2024",
     duration: "2 Jam",
+    nama: "Muhammad Syahrullah",
     pic_status: "process",
     clevel_status: "pending",
     hrd_status: "pending",
@@ -93,7 +100,14 @@ const submissions = [
 
       <OvertimeTable
         title="Riwayat Pengajuan"
-        :headers="['Tanggal', 'Durasi', 'Progress', 'Estimasi']"
+        :headers="[
+          'Tanggal',
+          'Durasi',
+          'Nama',
+          'Progress',
+          'Estimasi',
+          'Actions',
+        ]"
       >
         <template #header-action>
           <button
@@ -111,6 +125,7 @@ const submissions = [
           >
             <td class="p-6 font-medium text-gray-700">{{ item.date }}</td>
             <td class="p-6 text-gray-500">{{ item.duration }}</td>
+            <td class="p-6 text-gray-500">{{ item.nama }}</td>
             <td class="p-6">
               <Stepper
                 :pic-status="item.pic_status"
@@ -122,6 +137,29 @@ const submissions = [
               class="p-6 text-right text-[var(--gold-main)] font-black text-lg"
             >
               {{ item.amount }}
+            </td>
+            <td class="p-6">
+              <div class="flex justify-center items-cente gap-2">
+                <NuxtLink
+                  class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
+                  ><button class="hover:scale-125 transition-all">
+                    🔍
+                  </button></NuxtLink
+                >
+                <NuxtLink
+                  class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
+                  ><buton class="hover:scale-125 transition-all"
+                    >✅</buton
+                  ></NuxtLink
+                >
+                <NuxtLink
+                  class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
+                  ><button class="hover:scale-125 transition-all">❌</button>
+                </NuxtLink>
+                <!-- <BaseButton label="" variant="outline" type="submit" />
+                <BaseButton label="✅" variant="primary" type="submit" />
+                <BaseButton label="" variant="secondary" type="submit" /> -->
+              </div>
             </td>
           </tr>
         </template>

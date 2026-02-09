@@ -2,12 +2,12 @@
 import { ref, computed } from "vue";
 
 const route = useRoute();
-const isOpen = ref(false); 
+const isOpen = ref(false);
 const isSidebarOpen = useState("sidebar-toggle", () => true);
 
 const isCollapsed = computed({
   get: () => !isSidebarOpen.value,
-  set: (val) => isSidebarOpen.value = !val
+  set: (val) => (isSidebarOpen.value = !val),
 });
 
 const menus = [
@@ -47,7 +47,18 @@ const isActive = (path: string) =>
       'lg:translate-x-0',
     ]"
   >
-    <div class="h-16 flex items-center justify-between px-4 border-b border-zinc-800">
+    <div
+      class="h-16 flex items-center justify-between px-4 border-b border-zinc-800"
+    >
+      <div class="flex items-center justify-center gap-4">
+        <div class="flex-1 h-px bg-[#7b5902]"></div>
+        <img
+          src="/du-universal.png"
+          alt="Dewa United"
+          class="h-10 object-contain"
+        />
+        <div class="flex-1 h-px bg-[#7b5902]"></div>
+      </div>
       <h1 v-if="!isCollapsed" class="text-lg font-bold text-white">
         <span class="text-yellow-600">Dewa</span> Overtime
       </h1>
@@ -56,7 +67,7 @@ const isActive = (path: string) =>
         @click="isSidebarOpen = !isSidebarOpen"
         class="hidden lg:flex text-gray-400 hover:text-white p-2 rounded-lg hover:bg-zinc-800 transition-colors"
       >
-        {{ isSidebarOpen ? '❮' : '☰' }}
+        {{ isSidebarOpen ? "❮" : "☰" }}
       </button>
 
       <button
@@ -80,7 +91,9 @@ const isActive = (path: string) =>
               : 'hover:bg-yellow-600/20'
           "
         >
-          <span class="text-xl transition-transform duration-200 group-hover:scale-110">
+          <span
+            class="text-xl transition-transform duration-200 group-hover:scale-110"
+          >
             {{ menu.icon }}
           </span>
           <span v-if="!isCollapsed" class="font-medium transition-colors">
@@ -95,7 +108,9 @@ const isActive = (path: string) =>
           >
             <div class="flex items-center gap-3">
               <span class="text-xl">{{ menu.icon }}</span>
-              <span v-if="!isCollapsed" class="font-medium">{{ menu.name }}</span>
+              <span v-if="!isCollapsed" class="font-medium">{{
+                menu.name
+              }}</span>
             </div>
             <span
               v-if="!isCollapsed"
@@ -105,7 +120,7 @@ const isActive = (path: string) =>
               ▼
             </span>
           </button>
-          
+
           <div
             v-if="openMenu === menu.name && !isCollapsed"
             class="ml-10 mt-2 space-y-1 border-l border-zinc-700/50 pl-3"
@@ -115,7 +130,9 @@ const isActive = (path: string) =>
               :key="child.name"
               :to="child.to"
               class="block px-3 py-2 rounded-lg text-gray-400 text-sm hover:text-white hover:bg-yellow-600/40 transition-all"
-              :class="isActive(child.to).value ? 'text-yellow-400 font-bold' : ''"
+              :class="
+                isActive(child.to).value ? 'text-yellow-400 font-bold' : ''
+              "
             >
               {{ child.icon }} {{ child.name }}
             </NuxtLink>
@@ -124,9 +141,11 @@ const isActive = (path: string) =>
       </template>
     </nav>
 
-    <div class="p-4 border-t border-zinc-800 text-[10px] text-gray-500 text-center uppercase tracking-widest font-bold">
-       <span v-if="!isCollapsed">DU-OVERTIME 2026</span>
-       <span v-else>DU</span>
+    <div
+      class="p-4 border-t border-zinc-800 text-[10px] text-gray-500 text-center uppercase tracking-widest font-bold"
+    >
+      <span v-if="!isCollapsed">DU-OVERTIME 2026</span>
+      <span v-else>DU</span>
     </div>
   </aside>
 
