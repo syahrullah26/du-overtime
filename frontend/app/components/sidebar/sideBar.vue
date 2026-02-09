@@ -87,7 +87,7 @@ const isActive = (path: string) =>
           class="group flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 transition-all duration-200"
           :class="
             isActive(menu.to).value
-              ? 'bg-yellow-400 text-white shadow-inner'
+              ? 'bg-[var(--gold-dark)] text-white shadow-inner'
               : 'hover:bg-yellow-600/20'
           "
         >
@@ -131,7 +131,9 @@ const isActive = (path: string) =>
               :to="child.to"
               class="block px-3 py-2 rounded-lg text-gray-400 text-sm hover:text-white hover:bg-yellow-600/40 transition-all"
               :class="
-                isActive(child.to).value ? 'text-yellow-400 font-bold' : ''
+                isActive(child.to).value
+                  ? 'text-[var(--gold-dark)] font-bold'
+                  : ''
               "
             >
               {{ child.icon }} {{ child.name }}
