@@ -287,7 +287,7 @@ npx prisma migrate reset
    - See DEPLOYMENT_GUIDE.md
    - Configure production .env
    - Use PM2 or Docker
-
+tapi pada belom ada hehehehehehehehe
 ---
 
 ## Learning Resources
