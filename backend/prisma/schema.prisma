@@ -1,14 +1,108 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum Definitions
+enum UserRole {
+  EMPLOYEE
+  PIC
+  C_LEVEL
+  HRD
+  FINANCE
+}
+
+enum SubmissionStatus {
+  PENDING_PIC
+  PENDING_C_LEVEL
+  PENDING_HRD
+  COMPLETED
+  REJECTED
+}
+
+// Tabel: departments
+model Department {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  createdAt  DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  users      User[]
+
+  @@map("departments")
+}
+
+// Tabel: users
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String   // Untuk authentication
+  role      UserRole
+  deptId    String?  @map("dept_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  department          Department?           @relation(fields: [deptId], references: [id])
+  overtimeSubmissions OvertimeSubmission[]
+  overtimeLogs        OvertimeLog[]
+
+  @@map("users")
+}
+
+// Tabel: global_settings
+model GlobalSetting {
+  key       String  @id
+  value     Decimal
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("global_settings")
+}
+
+// Tabel: overtime_submissions
+model OvertimeSubmission {
+  id               String           @id @default(uuid())
+  employeeId       String           @map("employee_id")
+  date             DateTime
+  startTime        DateTime         @map("start_time")
+  endTime          DateTime         @map("end_time")
+  durationMin      Int              @map("duration_min")
+  status           SubmissionStatus @default(PENDING_PIC)
+  signaturePic     String?          @map("signature_pic")
+  signatureClevel  String?          @map("signature_clevel")
+  signatureHrd     String?          @map("signature_hrd")
+  appliedRate      Decimal          @map("applied_rate")
+  totalPay         Decimal          @map("total_pay")
+  reason           String?          // Alasan lembur
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  
+  // Relations
+  employee         User             @relation(fields: [employeeId], references: [id])
+  logs             OvertimeLog[]
+
+  @@map("overtime_submissions")
+}
+
+// Tabel: overtime_logs
+model OvertimeLog {
+  id           String   @id @default(uuid())
+  submissionId String   @map("submission_id")
+  actionBy     String   @map("action_by")
+  action       String   // APPROVED, REJECTED, CREATED
+  note         String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  submission   OvertimeSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  user         User               @relation(fields: [actionBy], references: [id])
+
+  @@map("overtime_logs")
 }

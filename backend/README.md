@@ -1,98 +1,443 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🚀 DU-Overtime Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Sistem Manajemen Lembur Dewa United dengan approval 3 tahap (PIC → C-Level → HRD) hingga verifikasi Finance.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Tech Stack
 
-## Description
+- **Framework**: NestJS
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **Authentication**: JWT (Passport)
+- **Validation**: class-validator
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🎯 Fitur Utama
 
-## Project setup
-
-```bash
-$ npm install
+### 1. **State Machine Approval Flow**
+```
+PENDING_PIC → PENDING_C_LEVEL → PENDING_HRD → COMPLETED
+                    ↓
+                REJECTED (di setiap tahap)
 ```
 
-## Compile and run the project
+### 2. **Role-Based Access Control (RBAC)**
+- `EMPLOYEE`: Buat pengajuan lembur
+- `PIC`: Approval tahap 1
+- `C_LEVEL`: Approval tahap 2
+- `HRD`: Approval tahap 3 (final)
+- `FINANCE`: Verifikasi pembayaran
 
+### 3. **Automatic Calculation**
+- Durasi otomatis dihitung dari start_time dan end_time
+- Tarif lembur diambil dari `global_settings` (snapshot)
+- Total pembayaran = (durasi/60) × flat_rate
+
+### 4. **Audit Trail**
+Setiap perubahan status tercatat di `overtime_logs`
+
+## 🛠️ Setup Instructions
+
+### Prerequisites
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+Node.js >= 18
+PostgreSQL >= 14
+npm or yarn
 ```
 
-## Run tests
+### 1. Clone & Install Dependencies
 
 ```bash
-# unit tests
-$ npm run test
+# Clone repository (atau copy file-file yang sudah dibuat)
+cd du-overtime-backend
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Install dependencies
+npm install
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 2. Database Setup
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# 1. Buat database PostgreSQL
+createdb du_overtime
+
+# Atau via psql:
+psql -U postgres
+CREATE DATABASE du_overtime;
+\q
+
+# 2. Copy environment variables
+cp .env.example .env
+
+# 3. Edit .env dan sesuaikan DATABASE_URL
+# DATABASE_URL="postgresql://username:password@localhost:5432/du_overtime?schema=public"
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 3. Prisma Setup
 
-## Resources
+```bash
+# Generate Prisma Client
+npx prisma generate
 
-Check out a few resources that may come in handy when working with NestJS:
+# Run migrations (create tables)
+npx prisma migrate dev --name init
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Seed database (create sample data)
+npm run prisma:seed
+```
 
-## Support
+### 4. Run Application
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# Development mode
+npm run start:dev
 
-## Stay in touch
+# Production build
+npm run build
+npm run start:prod
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Server akan berjalan di: **http://localhost:3000/api**
 
-## License
+### 5. Open Prisma Studio (Optional)
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```bash
+npm run prisma:studio
+```
+
+Browser akan terbuka di http://localhost:5555
+
+## 🔐 Default Login Credentials
+
+Setelah seed, gunakan credential berikut:
+
+| Role | Email | Password |
+|------|-------|----------|
+| EMPLOYEE | faris@dewaunited.com | password123 |
+| EMPLOYEE | arul@dewaunited.com | password123 |
+| PIC | pic.it@dewaunited.com | password123 |
+| C_LEVEL | clevel@dewaunited.com | password123 |
+| HRD | hrd@dewaunited.com | password123 |
+| FINANCE | finance@dewaunited.com | password123 |
+
+## 📡 API Endpoints
+
+### Authentication
+
+```bash
+POST   /api/auth/login          # Login
+POST   /api/auth/register       # Register (optional)
+GET    /api/auth/profile        # Get current user profile
+```
+
+### Overtime Management
+
+```bash
+# Employee
+POST   /api/overtime            # Create overtime submission
+GET    /api/overtime            # Get all submissions (filtered by role)
+GET    /api/overtime/stats      # Get statistics
+GET    /api/overtime/:id        # Get single submission
+
+# Approvers (PIC, C-Level, HRD)
+GET    /api/overtime/pending    # Get pending approvals
+PATCH  /api/overtime/:id/approve  # Approve submission
+PATCH  /api/overtime/:id/reject   # Reject submission
+```
+
+### Users & Departments
+
+```bash
+GET    /api/users               # Get all users (HRD+)
+GET    /api/users/:id           # Get user by ID
+GET    /api/users/role/:role    # Get users by role
+GET    /api/users/department/:id # Get users by department
+
+GET    /api/departments         # Get all departments
+POST   /api/departments         # Create department (HRD+)
+PUT    /api/departments/:id     # Update department (HRD+)
+DELETE /api/departments/:id     # Delete department (HRD+)
+```
+
+## 🧪 Testing API dengan cURL
+
+### 1. Login
+
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "faris@dewaunited.com",
+    "password": "password123"
+  }'
+```
+
+Simpan `access_token` yang didapat.
+
+### 2. Create Overtime Submission (Employee)
+
+```bash
+curl -X POST http://localhost:3000/api/overtime \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "date": "2026-02-10",
+    "startTime": "2026-02-10T18:00:00Z",
+    "endTime": "2026-02-10T22:00:00Z",
+    "reason": "Project deployment deadline"
+  }'
+```
+
+### 3. Get Pending Approvals (PIC)
+
+```bash
+# Login sebagai PIC dulu
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "pic.it@dewaunited.com",
+    "password": "password123"
+  }'
+
+# Get pending
+curl -X GET http://localhost:3000/api/overtime/pending \
+  -H "Authorization: Bearer PIC_TOKEN_HERE"
+```
+
+### 4. Approve Submission (PIC)
+
+```bash
+curl -X PATCH http://localhost:3000/api/overtime/SUBMISSION_ID/approve \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer PIC_TOKEN_HERE" \
+  -d '{
+    "signature": "data:image/png;base64,...",
+    "note": "Approved - valid overtime"
+  }'
+```
+
+## 📊 Database Schema
+
+### Tables
+
+1. **departments** - Daftar departemen
+2. **users** - Data karyawan & credentials
+3. **global_settings** - Konfigurasi sistem (flat rate)
+4. **overtime_submissions** - Data pengajuan lembur
+5. **overtime_logs** - Audit trail
+
+### Relationships
+
+```
+departments (1) → (N) users
+users (1) → (N) overtime_submissions
+overtime_submissions (1) → (N) overtime_logs
+```
+
+## 🔧 Configuration
+
+### Environment Variables (.env)
+
+```env
+DATABASE_URL="postgresql://user:pass@localhost:5432/du_overtime?schema=public"
+JWT_SECRET="your-secret-key"
+JWT_EXPIRATION="7d"
+PORT=3000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:3001
+```
+
+### Global Settings
+
+Ubah tarif lembur via Prisma Studio atau SQL:
+
+```sql
+UPDATE global_settings 
+SET value = 75000 
+WHERE key = 'FLAT_RATE_PER_HOUR';
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── auth/                 # Authentication module
+│   ├── dto/
+│   ├── auth.service.ts
+│   ├── auth.controller.ts
+│   ├── jwt.strategy.ts
+│   └── guards/
+├── overtime/            # Overtime management
+│   ├── dto/
+│   ├── overtime.service.ts
+│   └── overtime.controller.ts
+├── users/               # User management
+├── departments/         # Department management
+├── prisma/              # Prisma service
+└── main.ts              # Application entry point
+
+prisma/
+├── schema.prisma        # Database schema
+└── seed.ts             # Database seeder
+```
+
+## 🚀 Production Deployment
+
+### 1. Build
+
+```bash
+npm run build
+```
+
+### 2. Environment
+
+Pastikan production `.env`:
+- `NODE_ENV=production`
+- `DATABASE_URL` mengarah ke production database
+- `JWT_SECRET` yang kuat dan unik
+- `FRONTEND_URL` mengarah ke domain production
+
+### 3. Database Migration
+
+```bash
+# Production migration (tanpa seed)
+npx prisma migrate deploy
+```
+
+### 4. Start
+
+```bash
+npm run start:prod
+```
+
+### 5. Process Manager (PM2)
+
+```bash
+npm install -g pm2
+
+pm2 start dist/main.js --name du-overtime
+pm2 save
+pm2 startup
+```
+
+## 🐳 Docker (Optional)
+
+```dockerfile
+# Dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npx prisma generate
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "run", "start:prod"]
+```
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: du_overtime
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/du_overtime
+      JWT_SECRET: super-secret-key
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+```
+
+## 🧪 Testing
+
+```bash
+# Unit tests
+npm run test
+
+# E2E tests
+npm run test:e2e
+
+# Coverage
+npm run test:cov
+```
+
+## 📝 Business Logic Highlights
+
+### State Machine Flow
+
+```typescript
+PENDING_PIC (initial)
+  ├─ approve() by PIC → PENDING_C_LEVEL
+  └─ reject() by PIC → REJECTED
+
+PENDING_C_LEVEL
+  ├─ approve() by C_LEVEL → PENDING_HRD
+  └─ reject() by C_LEVEL → REJECTED
+
+PENDING_HRD
+  ├─ approve() by HRD → COMPLETED
+  └─ reject() by HRD → REJECTED
+```
+
+### Calculation Example
+
+```
+Durasi: 4 jam (240 menit)
+Flat Rate: Rp 50,000/jam
+Total Pay: (240/60) × 50000 = Rp 200,000
+```
+
+## 🆘 Troubleshooting
+
+### Error: "Can't reach database server"
+
+```bash
+# Check PostgreSQL is running
+pg_isready
+
+# Or restart PostgreSQL
+sudo service postgresql restart
+```
+
+### Error: "Prisma Client not generated"
+
+```bash
+npx prisma generate
+```
+
+### Error: Port 3000 already in use
+
+```bash
+# Kill process on port 3000
+lsof -ti:3000 | xargs kill -9
+
+# Or change PORT in .env
+```
+
+## 📚 Additional Resources
+
+- [NestJS Documentation](https://docs.nestjs.com)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs)
+
+## 👨‍💻 Developer
+
+Dibuat untuk memenuhi tugas kuliah sistem manajemen lembur Dewa United.
+
+## 📄 License
+
+MIT

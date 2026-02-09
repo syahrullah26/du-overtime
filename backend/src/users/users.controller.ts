@@ -1,34 +1,34 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '@prisma/client';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
   @Get()
+  @Roles(UserRole.HRD, UserRole.FINANCE, UserRole.C_LEVEL)
   findAll() {
     return this.usersService.findAll();
   }
 
+  @Get('role/:role')
+  @Roles(UserRole.HRD, UserRole.FINANCE, UserRole.C_LEVEL)
+  findByRole(@Param('role') role: string) {
+    return this.usersService.findByRole(role);
+  }
+
+  @Get('department/:deptId')
+  @Roles(UserRole.HRD, UserRole.FINANCE, UserRole.C_LEVEL, UserRole.PIC)
+  findByDepartment(@Param('deptId') deptId: string) {
+    return this.usersService.findByDepartment(deptId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.findOne(id);
   }
 }
