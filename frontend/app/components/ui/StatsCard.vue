@@ -3,11 +3,13 @@ defineProps<{
   label: string;
   value: string;
   icon: string;
+  aos: string;
 }>();
 </script>
 <template>
   <div
     class="bg-white border-b-4 border-[#C5A059] p-6 rounded-2xl shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-default"
+    :data-aos="aos"
   >
     <div class="flex justify-between items-start">
       <div>

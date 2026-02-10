@@ -100,11 +100,12 @@ const totalProcess = computed(() => {
       >
         <h3 class="font-bold text-xl text-gray-800">Riwayat Pengajuan</h3>
 
-        <button
+        <NuxtLink
+          to="/overtime/view"
           class="text-[var(--gold-main)] font-bold hover:text-[var(--gold-dark)] text-sm"
         >
           Lihat Semua →
-        </button>
+        </NuxtLink>
       </div>
       <div class="flex gap-8 justify-center items-center my-4 mx-4">
         <button

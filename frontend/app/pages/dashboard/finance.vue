@@ -110,11 +110,12 @@ const submissions = [
         ]"
       >
         <template #header-action>
-          <button
+          <NuxtLink
+            to="/overtime/view"
             class="text-[var(--gold-main)] font-bold hover:text-[var(--gold-dark)] text-sm"
           >
             Lihat Semua →
-          </button>
+          </NuxtLink>
         </template>
 
         <template #body-content>

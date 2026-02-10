@@ -64,17 +64,28 @@ const submissions = [
           Sistem Pengajuan Lembur - Dewa United Indonesia
         </p>
       </div>
-      <button
+      <NuxtLink
+        to="/overtime"
         class="bg-[var(--gold-main)] hover:bg-[] text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-gold/20 flex items-center gap-2"
       >
         <span class="text-xl">+</span> Ajukan Lembur
-      </button>
+      </NuxtLink>
     </header>
 
-    <ProfileCard v-for="data in profile" :key="data.userName" v-bind="data" />
+    <ProfileCard
+      v-for="data in profile"
+      :key="data.userName"
+      v-bind="data"
+      aos="zoom-in"
+    />
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-      <StatsCard v-for="stat in stats" :key="stat.label" v-bind="stat" />
+      <StatsCard
+        v-for="stat in stats"
+        :key="stat.label"
+        v-bind="stat"
+        aos="zoom-in"
+      />
     </div>
     <div
       class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100"
@@ -84,11 +95,12 @@ const submissions = [
       >
         <h3 class="font-bold text-xl text-gray-800">Riwayat Pengajuan</h3>
 
-        <button
+        <NuxtLink
+          to="/overtime/view"
           class="text-[var(--gold-main)] font-bold hover:text-[var(--gold-dark)] text-sm"
         >
           Lihat Semua →
-        </button>
+        </NuxtLink>
       </div>
 
       <OvertimeTable
@@ -96,11 +108,12 @@ const submissions = [
         :headers="['Tanggal', 'Durasi', 'Progress', 'Estimasi']"
       >
         <template #header-action>
-          <button
+          <NuxtLink
+            to="/overtime/view"
             class="text-[var(--gold-main)] font-bold hover:text-[var(--gold-dark)] text-sm"
           >
             Lihat Semua →
-          </button>
+          </NuxtLink>
         </template>
 
         <template #body-content>
