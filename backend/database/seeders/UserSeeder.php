@@ -71,13 +71,6 @@ class UserSeeder extends Seeder
                 'role' => 'EMPLOYEE',
                 'dept_id' => $esportsDept?->id,
             ],
-            [
-                'name' => 'Ahmad Pratama',
-                'email' => 'ahmad@dewaunited.com',
-                'password' => Hash::make('password123'),
-                'role' => 'EMPLOYEE',
-                'dept_id' => $itDept?->id,
-            ],
         ];
 
         foreach ($users as $user) {
