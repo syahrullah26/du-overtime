@@ -3,14 +3,12 @@ defineProps<{
   userName: string;
   position: string;
   imageUrl: string;
-  aos: string;
 }>();
 </script>
 <template>
   <section>
     <div
       class="grid grid-cols-1 gap-4 bg-white border-b-4 border-[var(--gold-main)] p-6 rounded-2xl shadow-sm hover:shadow-md transition-all cursor-default mb-5"
-      :data-aos="aos"
     >
       <div class="flex justify-center items-center">
         <img :src="imageUrl" class="rounded-full w-32 mx-auto mb-4" />

@@ -76,7 +76,6 @@ const submissions = [
       v-for="data in profile"
       :key="data.userName"
       v-bind="data"
-      aos="zoom-in"
     />
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
@@ -84,7 +83,6 @@ const submissions = [
         v-for="stat in stats"
         :key="stat.label"
         v-bind="stat"
-        aos="zoom-in"
       />
     </div>
     <div
