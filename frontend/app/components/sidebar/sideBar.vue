@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAuth } from '~/composables/useAuth'
 import { ref, computed } from "vue";
 
 const route = useRoute();
@@ -27,6 +28,12 @@ const openMenu = ref<string | null>(null);
 const toggleMenu = (name: string) => {
   openMenu.value = openMenu.value === name ? null : name;
 };
+
+const { logout } = useAuth()
+
+const logoutHandle = async () => {
+  await logout()
+}
 
 const isActive = (path: string) =>
   computed(() => route.path === path || route.path.startsWith(path + "/"));
@@ -148,6 +155,26 @@ const isActive = (path: string) =>
     >
       <span v-if="!isCollapsed">DU-OVERTIME 2026</span>
       <span v-else>DU</span>
+      <button
+        @click="logoutHandle"
+        class="w-full flex items-center cursor-pointer justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 bg-zinc-700/50 border border-red-500/30 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-200 active:scale-[0.98]"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-4 h-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5"
+          />
+        </svg>
+        Logout
+      </button>
     </div>
   </aside>
 
