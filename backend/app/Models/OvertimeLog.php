@@ -77,7 +77,7 @@ class OvertimeLog extends Model
     }
 
     /**
-     * Scope to filter by action type.
+     * Scope to filter by action.
      */
     public function scopeByAction($query, string $action)
     {
