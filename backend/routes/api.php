@@ -9,28 +9,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
-// Public routes 
+// Public 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Protected routes 
+// Protected 
 Route::middleware('auth:sanctum')->group(function () {
     
-    // Auth routes
+    // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
 
-    // Department routes
+    // Department
     Route::apiResource('departments', DepartmentController::class);
 
-    // User routes
+    // User
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{id}', [UserController::class, 'show']);
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::put('/users/{id}/password', [UserController::class, 'updatePassword']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
-    // Global Settings routes
+    // Global Settings
     Route::get('/settings', [GlobalSettingController::class, 'index']);
     Route::get('/settings/all', [GlobalSettingController::class, 'getAllSettings']);
     Route::get('/settings/{key}', [GlobalSettingController::class, 'show']);
@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/settings/{key}', [GlobalSettingController::class, 'update']);
     Route::delete('/settings/{key}', [GlobalSettingController::class, 'destroy']);
 
-    // Overtime Submission routes
+    // Overtime Submission
     Route::get('/overtime-submissions', [OvertimeSubmissionController::class, 'index']);
     Route::post('/overtime-submissions', [OvertimeSubmissionController::class, 'store']);
     Route::get('/overtime-submissions/statistics', [OvertimeSubmissionController::class, 'statistics']);
