@@ -130,7 +130,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
           </div>
           <div class="flex justify-between">
             <span class="font-medium">Employee:</span>
-            <span>Faris@dewaunited.com</span>
+            <span>faris@dewaunited.com</span>
           </div>
           <div class="col-span-1 mt-2 pt-2 border-t border-blue-300">
             <span class="font-medium">Password (all):</span>
