@@ -1,52 +1,41 @@
 <script setup lang="ts">
-import type { User } from "~/types/auth";
-definePageMeta({
-  middleware: "auth",
+const { userState, initUser } = useAuth();
+const { submissions, fetchSubmissions, loading } = useOvertime();
+
+definePageMeta({ middleware: "auth" });
+
+onMounted(async () => {
+  initUser();
+  await fetchSubmissions();
 });
 
-const { getCurrentUser, userState, logout } = useAuth();
-
-//get user dari localstorage
-const user = ref<User | null>(null);
-
-onMounted(() => {
-  //get current usern
-  user.value = getCurrentUser();
-
-  if (user.value?.role) {
-    //map role ke route
-    const roleRoutes: Record<string, string> = {
-      FINANCE: "/dashboard/finance",
-      HRD: "/dashboard/hrd",
-      PIC: "/dashboard/pic",
-      C_LEVEL: "/dashboard/clevel",
-      EMPLOYEE: "/dashboard/employee",
-    };
-
-    const targetRoute = roleRoutes[user.value.role] || "/dashboard/employee";
-
-    setTimeout(() => {
-      navigateTo(targetRoute);
-    }, 800);
-  } else {
-    navigateTo("/");
-  }
+// Mapping Actor ke Komponen
+const activeDashboard = computed(() => {
+  if (userState.value?.role === "EMPLOYEE")
+    return resolveComponent("DashboardEmployeeDashboard");
+  if (userState.value?.role === "PIC")
+    return resolveComponent("DashboardPicDashboard");
+  if (userState.value?.role === "FINANCE")
+    return resolveComponent("DashboardFinanceDashboard");
+  if (userState.value?.role === "HRD")
+    return resolveComponent("DashboardHrdDashboard");
+  if (userState.value?.role === "C_LEVEL")
+    return resolveComponent("DashboardClevelDashboard");
+  return null;
 });
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center"
-  >
-    <div
-      class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[#C5A059] mb-4"
-    ></div>
-    <p class="text-gray-500 font-medium animate-pulse">
-      Menyiapkan Dashboard Dewa Overtime...
-    </p>
-    <!-- opsional, jd ada nama user ny -->
-    <p v-if="user" class="text-gray-400 text-sm mt-2">
-      Selamat datang, {{ user.name }}
-    </p>
+  <div class="min-h-screen bg-[var(--white-bone)] p-8">
+    <component
+      :is="activeDashboard"
+      v-if="userState"
+      :user="userState"
+      :submissions="submissions"
+      :loading="loading"
+    />
+    <div v-else class="flex justify-center p-20">
+      <p class="animate-pulse">Menyiapkan Dashboard...</p>
+    </div>
   </div>
 </template>

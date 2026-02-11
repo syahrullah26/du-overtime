@@ -32,25 +32,26 @@ export const useAuth = () => {
 
       if (response.access_token) {
         // Store token and user data
-        localStorage.setItem('auth_token', response.access_token)
-        localStorage.setItem('user', JSON.stringify(response.user))
-        userState.value = response.user
+        localStorage.setItem("auth_token", response.access_token);
+        localStorage.setItem("user", JSON.stringify(response.user));
+        userState.value = response.user;
         // Redirect ke /dashboard saja
         // Biarkan dashboard/index.vue yang handle redirect ke role masing-masing
-        router.push('/dashboard')
-        
-        return { success: true, user: response.user }
+        router.push("/dashboard");
+
+        return { success: true, user: response.user };
       }
-      
-      return { success: false, error: 'Invalid response from server' }
+
+      return { success: false, error: "Invalid response from server" };
     } catch (error: any) {
-      console.error('Login error:', error)
-      return { 
-        success: false, 
-        error: error.data?.message || 'Login failed. Please check your credentials.' 
-      }
+      console.error("Login error:", error);
+      return {
+        success: false,
+        error:
+          error.data?.message || "Login failed. Please check your credentials.",
+      };
     }
-  }
+  };
 
   //Logout
   const logout = async (): Promise<void> => {
@@ -79,12 +80,12 @@ export const useAuth = () => {
 
   //get current user
   const getCurrentUser = (): User | null => {
-    return userState.value
+    return userState.value;
   };
 
   //cek user sudah terautentikasi
   const isAuthenticated = (): boolean => {
-    return !!userState.value
+    return !!userState.value;
   };
 
   //get autentikasi token
