@@ -34,7 +34,7 @@ export const useAuth = () => {
         // Store token and user data
         localStorage.setItem('auth_token', response.access_token)
         localStorage.setItem('user', JSON.stringify(response.user))
-        
+        userState.value = response.user
         // Redirect ke /dashboard saja
         // Biarkan dashboard/index.vue yang handle redirect ke role masing-masing
         router.push('/dashboard')
@@ -71,19 +71,20 @@ export const useAuth = () => {
       //hapus storage lokal
       localStorage.removeItem("auth_token");
       localStorage.removeItem("user");
+
+      userState.value = null;
       router.push("/");
     }
   };
 
   //get current user
   const getCurrentUser = (): User | null => {
-    const userJson = localStorage.getItem("user");
-    return userJson ? (JSON.parse(userJson) as User) : null;
+    return userState.value
   };
 
   //cek user sudah terautentikasi
   const isAuthenticated = (): boolean => {
-    return !!localStorage.getItem("auth_token");
+    return !!userState.value
   };
 
   //get autentikasi token
