@@ -3,6 +3,9 @@ import StatsCard from "~/components/ui/StatsCard.vue";
 import Stepper from "~/components/ui/Stepper.vue";
 import OvertimeTable from "~/components/ui/OvertimeTable.vue";
 import ProfileCard from "~/components/ui/ProfileCard.vue";
+const loading = ref(false);
+const { userState, logout } = useAuth();
+
 const stats = [
   {
     label: "Deadline Periode Bulan Ini",
@@ -78,7 +81,13 @@ const submissions = [
       </button>
     </header>
 
-    <ProfileCard v-for="data in profile" :key="data.userName" v-bind="data" />
+    <div v-if="userState" class="dashboard">
+      <ProfileCard v-bind="userState" />
+    </div>
+
+    <div v-else>
+      <p>Sedang memuat profil...</p>
+    </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
       <StatsCard v-for="stat in stats" :key="stat.label" v-bind="stat" />

@@ -1,39 +1,37 @@
 <script setup lang="ts">
-import type { User } from '~/types/auth';
+import type { User } from "~/types/auth";
 definePageMeta({
-  middleware: 'auth',
-})
+  middleware: "auth",
+});
 
-const { getCurrentUser } = useAuth()
+const { getCurrentUser, userState, logout } = useAuth();
 
 //get user dari localstorage
-const user = ref<User | null>(null)
+const user = ref<User | null>(null);
 
 onMounted(() => {
   //get current usern
-  user.value = getCurrentUser()
+  user.value = getCurrentUser();
 
   if (user.value?.role) {
     //map role ke route
     const roleRoutes: Record<string, string> = {
-      'FINANCE': '/dashboard/finance',
-      'HRD': '/dashboard/hrd',
-      'PIC': '/dashboard/pic',
-      'C_LEVEL': '/dashboard/clevel',
-      'EMPLOYEE': '/dashboard/employee',
-    }
+      FINANCE: "/dashboard/finance",
+      HRD: "/dashboard/hrd",
+      PIC: "/dashboard/pic",
+      C_LEVEL: "/dashboard/clevel",
+      EMPLOYEE: "/dashboard/employee",
+    };
 
-    const targetRoute = roleRoutes[user.value.role] || '/dashboard/employee'
-    
+    const targetRoute = roleRoutes[user.value.role] || "/dashboard/employee";
+
     setTimeout(() => {
-      navigateTo(targetRoute)
-    }, 800)
+      navigateTo(targetRoute);
+    }, 800);
   } else {
-    //kl ga ada user data balik lg ke login
-    navigateTo('/')
+    navigateTo("/");
   }
-})
-
+});
 </script>
 
 <template>

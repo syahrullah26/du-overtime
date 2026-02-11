@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAuth } from '~/composables/useAuth'
+import { useAuth } from "~/composables/useAuth";
 import { ref, computed } from "vue";
 
 const route = useRoute();
@@ -11,29 +11,64 @@ const isCollapsed = computed({
   set: (val) => (isSidebarOpen.value = !val),
 });
 
-const menus = [
-  { name: "Dashboard", to: "/", icon: "🏠" },
-  {
-    name: "Overtime Submission",
-    icon: "⏰",
-    children: [
-      { name: "Overtime", to: "/overtime", icon: "📝" },
-      { name: "View Overtime", to: "/overtime/view", icon: "📄" },
-    ],
-  },
-];
-
 const openMenu = ref<string | null>(null);
 
 const toggleMenu = (name: string) => {
   openMenu.value = openMenu.value === name ? null : name;
 };
 
-const { logout } = useAuth()
+const { logout, userState } = useAuth();
 
 const logoutHandle = async () => {
-  await logout()
+  await logout();
+};
+
+export interface Menu {
+  name: string;
+  to?: string;
+  icon: string;
+  roles?: string[];
+  chilren?: Menu[];
 }
+const menus = [
+  { name: "Dashboard", to: "/", icon: "🏠" },
+  {
+    name: "Overtime Submission",
+    icon: "⏰",
+    role: ["PIC", "EMPLOYEE"],
+    children: [
+      { name: "Overtime", to: "/overtime", icon: "📝" },
+      { name: "View Overtime", to: "/overtime/view", icon: "📄" },
+    ],
+  },
+  {
+    name: "Approval Finance",
+    icon: "💸",
+    role: ["FINANCE"],
+    children: [{ name: "View Overtime", to: "/overtime/view", icon: "📄" }],
+  },
+  {
+    name: "Approval HRD",
+    icon: "👨‍💼",
+    role: ["HRD"],
+    children: [{ name: "View Overtime", to: "/overtime/view", icon: "📄" }],
+  },
+  {
+    name: "Approval C-Level",
+    icon: "👨‍💼",
+    role: ["C_LEVEL"],
+    children: [{ name: "View Overtime", to: "/overtime/view", icon: "📄" }],
+  },
+];
+
+const filteredMenus = computed(() => {
+  if (!userState.value) return [];
+  const userRole = userState.value.role;
+  return menus.filter((menu) => {
+    if (!menu.role || menu.role.length === 0) return true;
+    return menu.role.includes(userRole);
+  });
+});
 
 const isActive = (path: string) =>
   computed(() => route.path === path || route.path.startsWith(path + "/"));
@@ -86,7 +121,7 @@ const isActive = (path: string) =>
     </div>
 
     <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-      <template v-for="menu in menus" :key="menu.name">
+      <template v-for="menu in filteredMenus" :key="menu.name">
         <NuxtLink
           v-if="!menu.children"
           :to="menu.to"
@@ -149,6 +184,48 @@ const isActive = (path: string) =>
         </div>
       </template>
     </nav>
+    <div
+      class="p-4 border-t border-zinc-800 text-[10px] text-gray-500 text-center uppercase tracking-widest font-bold"
+    >
+      <div
+        v-if="!isCollapsed"
+        class="bg-zinc-800 rounded-xl hover:bg-yellow-600/20 hover:shadow-inner hover:scale-110 hover:text-white hover:font-bold transition-all"
+      >
+        <div v-if="userState">
+          <NuxtLink class="cursor-pointer" to="/profile">
+            <div class="grid grid-cols-2 gap-2">
+              <img
+                :src="
+                  userState?.avatar ||
+                  'https://ui-avatars.com/api/?name=' + userState.name
+                "
+                class="rounded-full w-10 mx-auto my-2 object-cover aspect-square"
+              />
+              <div class="group flex flex-col items-center justify-center">
+                <span class="text-[var(--gold-dark)]">{{
+                  userState.name
+                }}</span>
+                <span>{{ userState.role }}</span>
+              </div>
+            </div>
+          </NuxtLink>
+        </div>
+      </div>
+      <div v-else class="flex items-center justify-center">
+        <NuxtLink
+          to="/profile"
+          class="rounded-full shadow-md shadow-zinc-900 hover:shadow-lg hover:shadow-yellow/20 hover:shadow-inner hover:scale-110 hover:text-white hover:font-bold transition-all"
+        >
+          <img
+            :src="
+              userState?.avatar ||
+              'https://ui-avatars.com/api/?name=' + userState?.name
+            "
+            class="rounded-full w-10 mx-auto my-2 object-cover aspect-square"
+          />
+        </NuxtLink>
+      </div>
+    </div>
 
     <div
       class="p-4 border-t border-zinc-800 text-[10px] text-gray-500 text-center uppercase tracking-widest font-bold"
@@ -174,7 +251,24 @@ const isActive = (path: string) =>
           />
         </svg>
         <span v-if="!isCollapsed">Logout</span>
-        <span v-else>OUT</span>
+        <span v-else>
+          <div class="flex justify-center items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5"
+              />
+            </svg>
+          </div>
+        </span>
       </button>
     </div>
   </aside>
