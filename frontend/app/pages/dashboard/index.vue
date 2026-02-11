@@ -13,7 +13,7 @@ onMounted(() => {
   //get current usern
   user.value = getCurrentUser()
 
-  if (user.value && user.value.role) {
+  if (user.value?.role) {
     //map role ke route
     const roleRoutes: Record<string, string> = {
       'FINANCE': '/dashboard/finance',
