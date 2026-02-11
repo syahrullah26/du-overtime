@@ -15,7 +15,7 @@ export const useAuth = () => {
       }
     }
   };
-
+  // initUser();
   //login
   const login = async (
     email: string,

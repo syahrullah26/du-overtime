@@ -9,13 +9,22 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
+
+// Health Check 
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'OK',
+        'timestamp' => now()->toIso8601String(),
+    ]);
+});
+
 // Public 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Protected 
 Route::middleware('auth:sanctum')->group(function () {
-    
+
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
@@ -45,7 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/overtime-submissions/{id}', [OvertimeSubmissionController::class, 'show']);
     Route::put('/overtime-submissions/{id}', [OvertimeSubmissionController::class, 'update']);
     Route::delete('/overtime-submissions/{id}', [OvertimeSubmissionController::class, 'destroy']);
-    
+
     // Approval actions
     Route::post('/overtime-submissions/{id}/approve', [OvertimeSubmissionController::class, 'approve']);
     Route::post('/overtime-submissions/{id}/reject', [OvertimeSubmissionController::class, 'reject']);

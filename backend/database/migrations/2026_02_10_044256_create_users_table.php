@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('email')->unique();
             $table->string('name');
+            $table->string('avatar')->nullable();
             $table->string('password');
             $table->enum('role', ['EMPLOYEE', 'PIC', 'C_LEVEL', 'HRD', 'FINANCE']);
             $table->uuid('dept_id')->nullable();
@@ -27,10 +28,10 @@ return new class extends Migration
 
             // Foreign Key
             $table->foreign('dept_id')
-                  ->references('id')
-                  ->on('departments')
-                  ->onDelete('set null')
-                  ->onUpdate('cascade');
+                ->references('id')
+                ->on('departments')
+                ->onDelete('set null')
+                ->onUpdate('cascade');
         });
     }
 
