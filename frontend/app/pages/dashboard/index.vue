@@ -1,35 +1,39 @@
 <script setup lang="ts">
-// Kita asumsikan Anda memiliki store atau composable untuk mengelola Auth
-// Jika belum, ini adalah simulasi logika pengecekan role
-const auth = {
-  user: {
-    role: "FINANCE", // Ini nantinya dinamis dari API NestJS/JWT
-  },
-};
+import type { User } from '~/types/auth';
+definePageMeta({
+  middleware: 'auth',
+})
 
-// Gunakan definePageMeta untuk memastikan user harus login sebelum masuk sini
-// definePageMeta({
-//   middleware: "auth", // Pastikan Anda sudah membuat middleware auth
-// });
+const { getCurrentUser } = useAuth()
+
+//get user dari localstorage
+const user = ref<User | null>(null)
 
 onMounted(() => {
-  const role = auth.user.role;
+  //get current usern
+  user.value = getCurrentUser()
 
-  // Logika Redirect berdasarkan Role
-  if (role === "EMPLOYEE") {
-    navigateTo("/dashboard/employee");
-  } else if (role === "PIC") {
-    navigateTo("/dashboard/pic");
-  } else if (role === "C_LEVEL") {
-    navigateTo("/dashboard/clevel");
-  } else if (role === "HRD") {
-    navigateTo("/dashboard/hrd");
-  } else if (role === "FINANCE") {
-    navigateTo("/dashboard/finance");
+  if (user.value && user.value.role) {
+    //map role ke route
+    const roleRoutes: Record<string, string> = {
+      'FINANCE': '/dashboard/finance',
+      'HRD': '/dashboard/hrd',
+      'PIC': '/dashboard/pic',
+      'C_LEVEL': '/dashboard/clevel',
+      'EMPLOYEE': '/dashboard/employee',
+    }
+
+    const targetRoute = roleRoutes[user.value.role] || '/dashboard/employee'
+    
+    setTimeout(() => {
+      navigateTo(targetRoute)
+    }, 800)
   } else {
-    navigateTo("/login");
+    //kl ga ada user data balik lg ke login
+    navigateTo('/')
   }
-});
+})
+
 </script>
 
 <template>
@@ -41,6 +45,10 @@ onMounted(() => {
     ></div>
     <p class="text-gray-500 font-medium animate-pulse">
       Menyiapkan Dashboard Dewa Overtime...
+    </p>
+    <!-- opsional, jd ada nama user ny -->
+    <p v-if="user" class="text-gray-400 text-sm mt-2">
+      Selamat datang, {{ user.name }}
     </p>
   </div>
 </template>

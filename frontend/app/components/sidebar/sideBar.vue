@@ -157,7 +157,7 @@ const isActive = (path: string) =>
       <span v-else>DU</span>
       <button
         @click="logoutHandle"
-        class="w-full flex items-center cursor-pointer justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 bg-zinc-700/50 border border-red-500/30 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-200 active:scale-[0.98]"
+        class="w-full flex items-center cursor-pointer justify-center mt-4 gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 bg-zinc-700/50 border border-red-500/30 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-200 active:scale-[0.98]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -173,7 +173,8 @@ const isActive = (path: string) =>
             d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5"
           />
         </svg>
-        Logout
+        <span v-if="!isCollapsed">Logout</span>
+        <span v-else>OUT</span>
       </button>
     </div>
   </aside>
