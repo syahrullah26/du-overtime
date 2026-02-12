@@ -7,9 +7,9 @@ use App\Models\Department;
 use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
-{
+{   
     /**
-     * Display a listing of departments.
+     * Display a listing of departments.     
      *
      * @return \Illuminate\Http\JsonResponse
      */
