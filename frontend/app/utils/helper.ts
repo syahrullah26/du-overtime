@@ -14,3 +14,17 @@ export const formatCurrency = (amount: number) => {
     minimumFractionDigits: 0,
   }).format(amount);
 };
+
+export const formatDate = (date: string | Date | number) => {
+  const d = new Date(date);
+
+  if (isNaN(d.getTime())) {
+    return "-";
+  }
+
+  return d.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};

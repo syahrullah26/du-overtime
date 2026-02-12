@@ -1,50 +1,12 @@
 <script setup lang="ts">
-const userAuth = {
-  id: 1,
-  name: "Manusia 1",
-  jabatan: "Jabatan 1",
-};
+const { userState, getToken } = useAuth();
 
-const pic = [
-  {
-    id: 1,
-    label: "Manusia 1",
-    value: "manusia1",
-  },
-  {
-    id: 2,
-    label: "Manusia 2",
-    value: "manusia2",
-  },
-  {
-    id: 3,
-    label: "Manusia 4",
-    value: "manusia4",
-  },
-  {
-    id: 4,
-    label: "Manusia 4",
-    value: "manusia4",
-  },
-];
+//ambil data user login
+const name = computed(() => userState.value?.name);
+const role = computed(() => userState.value?.role);
 
-const clevel = [
-  {
-    id: 1,
-    label: "C-Level 1",
-    value: "clevel1",
-  },
-  {
-    id: 2,
-    label: "C-Level 2",
-    value: "clevel2",
-  },
-  {
-    id: 3,
-    label: "C-Level 3",
-    value: "clevel3",
-  },
-];
+
+
 const form = ref({
   name: "",
   position: "",
@@ -77,13 +39,13 @@ const form = ref({
       >
         <h3 class="font-bold text-xl text-gray-800">Form Pengajuan</h3>
       </div>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mx-4 my-4">
         <BaseInput
           label="nama"
           type="text"
           placeholder="Nama"
-          v-model="userAuth.name"
+          v-model="name"
           readonly
           disabled
         />
@@ -91,7 +53,7 @@ const form = ref({
           label="jabatan"
           type="text"
           placeholder="Jabatan"
-          v-model="userAuth.jabatan"
+          v-model="role"
           readonly
           disabled
         />

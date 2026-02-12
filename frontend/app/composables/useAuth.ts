@@ -3,28 +3,26 @@ import type { LoginResponse, LoginResult, User } from "~/types/auth";
 export const useAuth = () => {
   const config = useRuntimeConfig();
   const router = useRouter();
-  const API_URL = config.public.apiBase || "http://localhost:8000/api";
   const userState = useState<User | null>("auth_user", () => null);
+  const API_URL = config.public.apiBase || "http://localhost:8000/api";
 
   const initUser = () => {
     if (process.client) {
       const userJson = localStorage.getItem("user");
       const token = localStorage.getItem("auth_token");
-
       if (userJson && token) {
         try {
-          const parsedUser = JSON.parse(userJson);
-          userState.value = parsedUser;
-          return parsedUser;
+          userState.value = JSON.parse(userJson);
         } catch (e) {
           localStorage.removeItem("user");
-          localStorage.removeItem("auth_token");
           userState.value = null;
         }
       }
     }
-    return null;
   };
+  if (process.client && !userState.value) {
+    initUser();
+  }
   //login
   const login = async (
     email: string,
@@ -33,21 +31,23 @@ export const useAuth = () => {
     try {
       const response = await $fetch<LoginResponse>(`${API_URL}/login`, {
         method: "POST",
+
         body: {
           email,
+
           password,
         },
       });
 
       if (response.access_token) {
         // Store token and user data
-        localStorage.setItem('auth_token', response.access_token)
-        localStorage.setItem('user', JSON.stringify(response.user))
-        userState.value = response.user
-        
-        router.push('/dashboard')
-        
-        return { success: true, user: response.user }
+        localStorage.setItem("auth_token", response.access_token);
+        localStorage.setItem("user", JSON.stringify(response.user));
+        userState.value = response.user;
+        // Redirect ke /dashboard saja
+        // Biarkan dashboard/index.vue yang handle redirect ke role masing-masing
+        router.push("/dashboard");
+        return { success: true, user: response.user };
       }
 
       return { success: false, error: "Invalid response from server" };
@@ -60,12 +60,10 @@ export const useAuth = () => {
       };
     }
   };
-
   //Logout
   const logout = async (): Promise<void> => {
     try {
       const token = localStorage.getItem("auth_token");
-
       if (token) {
         await $fetch(`${API_URL}/logout`, {
           method: "POST",
@@ -80,27 +78,22 @@ export const useAuth = () => {
       //hapus storage lokal
       localStorage.removeItem("auth_token");
       localStorage.removeItem("user");
-
       userState.value = null;
       router.push("/");
     }
   };
-
   //get current user
   const getCurrentUser = (): User | null => {
     return userState.value;
   };
-
   //cek user sudah terautentikasi
   const isAuthenticated = (): boolean => {
     return !!userState.value;
   };
-
   //get autentikasi token
   const getToken = (): string | null => {
     return localStorage.getItem("auth_token");
   };
-
   return {
     userState,
     initUser,
