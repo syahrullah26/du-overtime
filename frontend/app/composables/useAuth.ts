@@ -82,6 +82,9 @@ export const useAuth = () => {
       router.push("/");
     }
   };
+  //get user by roles
+
+
   //get current user
   const getCurrentUser = (): User | null => {
     return userState.value;

@@ -1,11 +1,21 @@
 <script setup lang="ts">
+import { useUser } from "~/composables/useUser";
+
 const { userState, getToken } = useAuth();
+
+const { fetchUsersByRole } = useUser();
+
+const picOptions = ref([]);
+const clevelOptions = ref([]);
+
+onMounted(async () => {
+  picOptions.value = await fetchUsersByRole("pic");
+  clevelOptions.value = await fetchUsersByRole("c-level");
+});
 
 //ambil data user login
 const name = computed(() => userState.value?.name);
 const role = computed(() => userState.value?.role);
-
-
 
 const form = ref({
   name: "",
@@ -88,13 +98,13 @@ const form = ref({
           v-model="form.pic"
           label="Pilih PIC"
           placeholder="Pilih PIC Overtime"
-          :options="pic"
+          :options="picOptions"
         />
         <BaseSelect
           v-model="form.clevel"
           label="Pilih C-Level"
           placeholder="Pilih C-Level Overtime"
-          :options="clevel"
+          :options="clevelOptions"
         />
       </div>
       <div class="flex justify-center items-center gap-2 my-4">
