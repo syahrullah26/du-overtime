@@ -3,19 +3,28 @@ import type { LoginResponse, LoginResult, User } from "~/types/auth";
 export const useAuth = () => {
   const config = useRuntimeConfig();
   const router = useRouter();
-
-  const userState = useState<User | null>("auth_user", () => null);
-  //base api url
   const API_URL = config.public.apiBase || "http://localhost:8000/api";
+  const userState = useState<User | null>("auth_user", () => null);
+
   const initUser = () => {
     if (process.client) {
       const userJson = localStorage.getItem("user");
-      if (userJson) {
-        userState.value = JSON.parse(userJson);
+      const token = localStorage.getItem("auth_token");
+
+      if (userJson && token) {
+        try {
+          const parsedUser = JSON.parse(userJson);
+          userState.value = parsedUser;
+          return parsedUser;
+        } catch (e) {
+          localStorage.removeItem("user");
+          localStorage.removeItem("auth_token");
+          userState.value = null;
+        }
       }
     }
+    return null;
   };
-  // initUser();
   //login
   const login = async (
     email: string,

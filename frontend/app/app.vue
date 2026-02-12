@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { initUser } = useAuth();
-onMounted(() => {
+onBeforeMount(() => {
   initUser();
 });
 </script>

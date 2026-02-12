@@ -5,7 +5,6 @@ const { submissions, fetchSubmissions, loading } = useOvertime();
 definePageMeta({ middleware: "auth" });
 
 onMounted(async () => {
-  initUser();
   await fetchSubmissions();
 });
 
@@ -26,16 +25,28 @@ const activeDashboard = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[var(--white-bone)] p-8">
-    <component
-      :is="activeDashboard"
-      v-if="userState"
-      :user="userState"
-      :submissions="submissions"
-      :loading="loading"
-    />
-    <div v-else class="flex justify-center p-20">
-      <p class="animate-pulse">Menyiapkan Dashboard...</p>
-    </div>
+  <div class="w-full min-h-screen bg-[var(--white-bone)]">
+    <ClientOnly>
+      <div v-if="userState">
+        <component
+          :is="activeDashboard"
+          :user="userState"
+          :submissions="submissions"
+        />
+      </div>
+
+      <template #fallback>
+        <div class="flex items-center justify-center min-h-[60vh] w-full">
+          <div class="flex flex-col items-center gap-4">
+            <div
+              class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--gold-main)]"
+            ></div>
+            <p class="text-gray-400 font-medium animate-pulse">
+              Memuat Dashboard...
+            </p>
+          </div>
+        </div>
+      </template>
+    </ClientOnly>
   </div>
 </template>

@@ -12,29 +12,29 @@ const props = defineProps<{
   loading: boolean;
 }>();
 
-const stats = computed(() => {
-  const totalGross = props.submissions.reduce(
-    (acc, curr) => acc + (curr.total_pay || 0),
-    0,
-  );
-  const pendingCount = props.submissions.filter((s) =>
-    s.status.startsWith("PENDING"),
-  ).length;
+// const stats = computed(() => {
+//   const totalGross = props.submissions.reduce(
+//     (acc, curr) => acc + (curr.total_pay || 0),
+//     0,
+//   );
+//   const pendingCount = props.submissions.filter((s) =>
+//     s.status.startsWith("PENDING"),
+//   ).length;
 
-  return [
-    {
-      label: "Total Pengajuan",
-      value: `${props.submissions.length} Data`,
-      icon: "🕒",
-    },
-    { label: "Status Pengajuan", value: `${pendingCount} Pending`, icon: "📄" },
-    {
-      label: "Total Lembur (Gross)",
-      value: formatCurrency(totalGross),
-      icon: "💰",
-    },
-  ];
-});
+//   return [
+//     {
+//       label: "Total Pengajuan",
+//       value: `${props.submissions.length} Data`,
+//       icon: "🕒",
+//     },
+//     { label: "Status Pengajuan", value: `${pendingCount} Pending`, icon: "📄" },
+//     {
+//       label: "Total Lembur (Gross)",
+//       value: formatCurrency(totalGross),
+//       icon: "💰",
+//     },
+//   ];
+// });
 
 const getStepperStatus = (
   item: OvertimeSubmission,
@@ -84,7 +84,7 @@ const getStepperStatus = (
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <StatsCard v-for="stat in stats" :key="stat.label" v-bind="stat" />
+      <!-- <StatsCacrd v-for="stat in stats" :key="stat.label" v-bind="stat" /> -->
     </div>
 
     <div
