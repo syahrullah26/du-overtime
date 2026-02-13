@@ -1,16 +1,22 @@
 <script setup lang="ts">
 import { useUser } from "~/composables/useUser";
 
-const { userState, getToken } = useAuth();
-
+const { userState } = useAuth();
 const { fetchUsersByRole } = useUser();
 
 const picOptions = ref([]);
 const clevelOptions = ref([]);
 
-onMounted(async () => {
-  picOptions.value = await fetchUsersByRole("pic");
-  clevelOptions.value = await fetchUsersByRole("c-level");
+const { pending } = useAsyncData("load-roles", async () => {
+  if (userState.value) {
+    const [pics, clevels] = await Promise.all([
+      fetchUsersByRole("pic"),
+      fetchUsersByRole("c-level"),
+    ]);
+    picOptions.value = pics;
+    clevelOptions.value = clevels;
+  }
+  return true;
 });
 
 //ambil data user login

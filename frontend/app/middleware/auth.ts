@@ -1,34 +1,32 @@
 export default defineNuxtRouteMiddleware((to, from) => {
-  if (process.server) return
+  const { isAuthenticated, userState } = useAuth();
 
-  const { isAuthenticated, getCurrentUser } = useAuth()
+  //cek role dari meta yang ada di layouts/default.vue
+  const allowedRoles = to.meta.roles as string[];
 
-  //cek user autentikasi
+  //cek login
   if (!isAuthenticated()) {
-    //balik ke login page kalo ga terautentikasi
-    if (to.path.startsWith('/dashboard')) {
-      return navigateTo('/')
+    if (to.path !== "/") {
+      return navigateTo("/");
     }
-    return
+    return;
   }
 
-  if (to.path === '/' && isAuthenticated()) {
-    //redirect ke dashboard kalo coba akses login page padahal dah login
-    return navigateTo('/dashboard')
-  }
-  if (to.path === '/dashboard') {
-    return
-  }
-
- 
-  //dapet akses kl user pny role
-  //kl salah role, diredirect ke dashboard/index.vue
-  if (to.path.startsWith('/dashboard/')) {
-    const user = getCurrentUser()
-    
-    if (!user) {
-      return navigateTo('/')
+  //kalo udah login
+  if (isAuthenticated()) {
+    if (to.path === "/") {
+      return navigateTo("/dashboard");
     }
-    return
+
+    // cek role
+    if (allowedRoles && allowedRoles.length > 0) {
+      const userRole = userState.value?.role;
+
+      // kalo role tidak sesuai
+      if (!userRole || !allowedRoles.includes(userRole)) {
+        console.warn("Akses ditolak: Role tidak sesuai");
+        return navigateTo("/dashboard");
+      }
+    }
   }
-})
+});
