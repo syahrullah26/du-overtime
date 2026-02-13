@@ -3,6 +3,9 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\EnsureTokenInCookie;
+use App\Http\Middleware\ForceJsonResponse;
+use Illuminate\Http\Request;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -14,9 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [
+            EnsureTokenInCookie::class,
             EnsureFrontendRequestsAreStateful::class,
+            ForceJsonResponse::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            //
+        });
     })->create();

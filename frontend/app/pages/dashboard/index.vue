@@ -2,6 +2,11 @@
 const { userState } = useAuth();
 const { submissions, fetchSubmissions, loading } = useOvertime();
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> c2d3016871ba1a9496fed84e658caabfe37e57a9
 onMounted(async () => {
   await fetchSubmissions();
 });

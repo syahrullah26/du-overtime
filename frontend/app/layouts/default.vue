@@ -2,9 +2,15 @@
 import sideBar from "../components/sidebar/sideBar.vue";
 import footerDefault from "../components/footer/footerDefault.vue";
 const isSidebarOpen = useState("sidebar-toggle", () => true);
+<<<<<<< HEAD
 // definePageMeta({
 //   middleware: "auth",
 // });
+=======
+definePageMeta({
+  roles: ["EMPLOYEE", "HRD", "FINANCE", "PIC", "C_LEVEL"],
+});
+>>>>>>> c2d3016871ba1a9496fed84e658caabfe37e57a9
 </script>
 <template>
   <div class="min-h-screen bg-[var(--white-bone)] text-zinc-100">
