@@ -59,11 +59,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/overtime-submissions/{id}/approve', [OvertimeSubmissionController::class, 'approve']);
     Route::post('/overtime-submissions/{id}/reject', [OvertimeSubmissionController::class, 'reject']);
 });
-
-// Health check route
-Route::get('/health', function () {
-    return response()->json([
-        'status' => 'OK',
-        'timestamp' => now()->toIso8601String(),
-    ]);
-});

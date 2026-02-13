@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class GlobalSettingController extends Controller
 {
     /**
-     * Display a listing of global settings.
+     * list globl sttingny
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -23,14 +23,14 @@ class GlobalSettingController extends Controller
     }
 
     /**
-     * Store a newly created setting.
+     * buat setting baru
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        // Only HRD or FINANCE can create settings
+        // cm hr dan finance yg bisa buat baru
         if (!in_array($request->user()->role, ['HRD', 'FINANCE'])) {
             return response()->json([
                 'message' => 'Unauthorized to create settings',
@@ -52,7 +52,7 @@ class GlobalSettingController extends Controller
     }
 
     /**
-     * Display the specified setting.
+     * liat setting
      *
      * @param string $key
      * @return \Illuminate\Http\JsonResponse
@@ -67,7 +67,7 @@ class GlobalSettingController extends Controller
     }
 
     /**
-     * Update the specified setting.
+     * updt setting.
      *
      * @param Request $request
      * @param string $key
@@ -75,7 +75,7 @@ class GlobalSettingController extends Controller
      */
     public function update(Request $request, string $key)
     {
-        // Only HRD or FINANCE can update settings
+        // cm hr and finance yg bs updt
         if (!in_array($request->user()->role, ['HRD', 'FINANCE'])) {
             return response()->json([
                 'message' => 'Unauthorized to update settings',
@@ -98,7 +98,7 @@ class GlobalSettingController extends Controller
     }
 
     /**
-     * Remove the specified setting.
+     * hapus settingan tertentu
      *
      * @param Request $request
      * @param string $key
@@ -106,7 +106,7 @@ class GlobalSettingController extends Controller
      */
     public function destroy(Request $request, string $key)
     {
-        // Only HRD or FINANCE can delete settings
+        // cm hr dan finance yg bs
         if (!in_array($request->user()->role, ['HRD', 'FINANCE'])) {
             return response()->json([
                 'message' => 'Unauthorized to delete settings',
@@ -122,7 +122,7 @@ class GlobalSettingController extends Controller
     }
 
     /**
-     * Get all settings as key-value pairs.
+     * get semua settingny
      *
      * @return \Illuminate\Http\JsonResponse
      */

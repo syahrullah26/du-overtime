@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
-     * Register a new user.
+     * regis user bru.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -35,37 +35,34 @@ class AuthController extends Controller
             'dept_id' => $validated['dept_id'] ?? null,
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
             'message' => 'User registered successfully',
             'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'Bearer',
         ], 201);
     }
 
     /**
-     * Login user and create token.
+     * login
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+        if (!Auth::attempt($credentials)) {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
         }
 
+        $user = Auth::user();
+        
+        //sanctumtoken
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -77,22 +74,28 @@ class AuthController extends Controller
     }
 
     /**
-     * Logout user (revoke token).
+     * logout
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function logout(Request $request)
     {
+        //apus token
         $request->user()->currentAccessToken()->delete();
+        
+        //clearsession
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json([
             'message' => 'Logged out successfully',
         ]);
     }
-
+    
     /**
-     * Get authenticated user.
+     * get user yg dah ke auntekntikasi
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse

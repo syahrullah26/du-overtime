@@ -1,4 +1,3 @@
-// composables/useOvertime.ts
 import type { OvertimeSubmission } from "~/types/auth";
 
 export const useOvertime = () => {
@@ -36,7 +35,7 @@ export const useOvertime = () => {
     }
   };
 
-  //create overtime
+  //pengajuan
   const submitOvertime = async (payload: Partial<OvertimeSubmission>) => {
     try {
       return await $fetch(`${API_URL}/overtime-submissions`, {

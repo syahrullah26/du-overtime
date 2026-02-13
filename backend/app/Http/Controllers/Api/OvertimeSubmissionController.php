@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 class OvertimeSubmissionController extends Controller
 {
     /**
-     * Display a listing of overtime submissions.
+     * list pengajuan.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -20,27 +20,27 @@ class OvertimeSubmissionController extends Controller
     {
         $query = OvertimeSubmission::with(['employee.department', 'logs.actionByUser']);
 
-        // Filter by status
+        // Filter status
         if ($request->has('status')) {
             $query->byStatus($request->status);
         }
 
-        // Filter by employee (for specific user)
+        // Filter spesifik usr
         if ($request->has('employee_id')) {
             $query->byEmployee($request->employee_id);
         }
 
-        // Filter by date range
+        // Filter tanggal
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->dateRange($request->start_date, $request->end_date);
         }
 
-        // Filter by current user if employee role
+        // Filter current user roleny employee
         if ($request->user()->role === 'EMPLOYEE') {
             $query->byEmployee($request->user()->id);
         }
 
-        // Filter by pending approvals for PIC, C_LEVEL, HRD
+        // Filter pending pengajuan dari PIC, C_LEVEL, HRD
         if ($request->has('pending_for_me') && $request->pending_for_me) {
             $statusMap = [
                 'PIC' => OvertimeSubmission::STATUS_PENDING_PIC,
@@ -59,7 +59,7 @@ class OvertimeSubmissionController extends Controller
     }
 
     /**
-     * Store a newly created overtime submission.
+     * buat pengajuan.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -76,17 +76,17 @@ class OvertimeSubmissionController extends Controller
         $submission->employee_id = $request->user()->id;
         $submission->status = OvertimeSubmission::STATUS_PENDING_PIC;
         
-        // Calculate duration
+        // kalkulasi durasi
         $submission->calculateDuration();
         
-        // Set initial rate and pay (will be recalculated on final approval)
+        // set rateny
         $flatRate = GlobalSetting::getValue('FLAT_RATE_PER_HOUR', 50000);
         $submission->applied_rate = $flatRate;
         $submission->total_pay = round(($submission->duration_min / 60) * $flatRate, 2);
         
         $submission->save();
 
-        // Create initial log
+        // masukin ke log
         $submission->createLog(
             $request->user()->id,
             'SUBMIT',
@@ -101,7 +101,7 @@ class OvertimeSubmissionController extends Controller
     }
 
     /**
-     * Display the specified overtime submission.
+     * liat pengajuan lembur tertentu
      *
      * @param string $id
      * @return \Illuminate\Http\JsonResponse
@@ -119,8 +119,8 @@ class OvertimeSubmissionController extends Controller
     }
 
     /**
-     * Update the specified overtime submission.
-     * Only allowed if status is still PENDING_PIC.
+     * apdt pengajuan tertentu.
+     * boleh kalo cuma PENDING_PIC.
      *
      * @param Request $request
      * @param string $id
@@ -130,7 +130,7 @@ class OvertimeSubmissionController extends Controller
     {
         $submission = OvertimeSubmission::findOrFail($id);
 
-        // Only allow update if still pending PIC and user is the owner
+        // cm boleh apdt kl status pending pic
         if ($submission->status !== OvertimeSubmission::STATUS_PENDING_PIC) {
             return response()->json([
                 'message' => 'Cannot update submission after approval process has started',
@@ -151,7 +151,7 @@ class OvertimeSubmissionController extends Controller
 
         $submission->update($validated);
         
-        // Recalculate duration if times changed
+        // kalkulasi ulg kalo waktu brubah
         if (isset($validated['start_time']) || isset($validated['end_time'])) {
             $submission->calculateDuration();
             $submission->calculateTotalPay();
@@ -165,7 +165,7 @@ class OvertimeSubmissionController extends Controller
     }
 
     /**
-     * Approve the overtime submission.
+     * epruf pengajuan.
      *
      * @param Request $request
      * @param string $id
@@ -176,7 +176,6 @@ class OvertimeSubmissionController extends Controller
         $submission = OvertimeSubmission::findOrFail($id);
         $user = $request->user();
 
-        // Check if user can approve this submission
         if (!$submission->canBeApprovedBy($user->role)) {
             return response()->json([
                 'message' => 'You are not authorized to approve this submission at this stage',
@@ -184,12 +183,12 @@ class OvertimeSubmissionController extends Controller
         }
 
         $validated = $request->validate([
-            'signature' => 'nullable|file|image|max:2048', // Max 2MB
+            'signature' => 'nullable|file|image|max:2048', // max 2mb y
         ]);
 
         $signaturePath = null;
 
-        // Handle signature upload if provided
+        // tandatangan ke upload kl provide
         if ($request->hasFile('signature')) {
             $signaturePath = $request->file('signature')->store('signatures', 'public');
         }
@@ -207,7 +206,7 @@ class OvertimeSubmissionController extends Controller
     }
 
     /**
-     * Reject the overtime submission.
+     * reject pegajuan.
      *
      * @param Request $request
      * @param string $id
@@ -242,8 +241,8 @@ class OvertimeSubmissionController extends Controller
     }
 
     /**
-     * Delete the overtime submission.
-     * Only allowed if status is PENDING_PIC and user is the owner.
+     * dlete pngajuan.
+     * cuma boleh kalo status msh PENDING_PIC 
      *
      * @param Request $request
      * @param string $id
@@ -253,7 +252,6 @@ class OvertimeSubmissionController extends Controller
     {
         $submission = OvertimeSubmission::findOrFail($id);
 
-        // Only allow deletion if still pending PIC and user is the owner
         if ($submission->status !== OvertimeSubmission::STATUS_PENDING_PIC) {
             return response()->json([
                 'message' => 'Cannot delete submission after approval process has started',
@@ -274,7 +272,7 @@ class OvertimeSubmissionController extends Controller
     }
 
     /**
-     * Get statistics for overtime submissions.
+     * get statistik pengajuan lembur
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -282,13 +280,11 @@ class OvertimeSubmissionController extends Controller
     public function statistics(Request $request)
     {
         $query = OvertimeSubmission::query();
-
-        // Filter by employee if not admin
         if ($request->user()->role === 'EMPLOYEE') {
             $query->byEmployee($request->user()->id);
         }
 
-        // Filter by date range if provided
+        // filter tanggal
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->dateRange($request->start_date, $request->end_date);
         }

@@ -29,7 +29,7 @@ class UserController extends Controller
             $query->where('dept_id', $request->dept_id);
         }
 
-        // Search by name or email
+        // Search name ato email
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -59,7 +59,7 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified user.
+     * Update user tertentu.
      *
      * @param Request $request
      * @param string $id
@@ -69,7 +69,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Only allow users to update their own profile or HRD can update anyone
+        // bolehin user update profilenya sendiri, ditambah hrd
         if ($request->user()->id !== $id && $request->user()->role !== 'HRD') {
             return response()->json([
                 'message' => 'Unauthorized to update this user',
@@ -82,7 +82,7 @@ class UserController extends Controller
             'dept_id' => 'nullable|uuid|exists:departments,id',
         ]);
 
-        // Only HRD can update role
+        // cm hrd yg bs apdet role
         if ($request->has('role') && $request->user()->role === 'HRD') {
             $request->validate([
                 'role' => 'in:EMPLOYEE,PIC,C_LEVEL,HRD,FINANCE',
@@ -99,7 +99,7 @@ class UserController extends Controller
     }
 
     /**
-     * Update user password.
+     * apdet user pw.
      *
      * @param Request $request
      * @param string $id
@@ -109,7 +109,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Only allow users to update their own password
+        // user cm bs ganti pw dia sndiri
         if ($request->user()->id !== $id) {
             return response()->json([
                 'message' => 'Unauthorized to update password',
@@ -121,7 +121,7 @@ class UserController extends Controller
             'new_password' => 'required|string|min:8|confirmed',
         ]);
 
-        // Verify current password
+        // verify pw
         if (!Hash::check($validated['current_password'], $user->password)) {
             return response()->json([
                 'message' => 'Current password is incorrect',
@@ -146,7 +146,7 @@ class UserController extends Controller
      */
     public function destroy(Request $request, string $id)
     {
-        // Only HRD can delete users
+        // cm hr yg bs dlt user
         if ($request->user()->role !== 'HRD') {
             return response()->json([
                 'message' => 'Unauthorized to delete users',
@@ -155,7 +155,6 @@ class UserController extends Controller
 
         $user = User::findOrFail($id);
 
-        // Prevent deleting own account
         if ($request->user()->id === $id) {
             return response()->json([
                 'message' => 'Cannot delete your own account',

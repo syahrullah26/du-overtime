@@ -1,109 +1,94 @@
-import type { LoginResponse, LoginResult, User } from "~/types/auth";
+import type { User } from '~/types/auth'
+
+interface LoginResponse {
+  success: boolean
+  user: User
+  message: string
+}
+
+interface LoginResult {
+  success: boolean
+  user?: User
+  error?: string
+}
 
 export const useAuth = () => {
-  const config = useRuntimeConfig();
-  const router = useRouter();
-  const userState = useState<User | null>("auth_user", () => null);
-  const API_URL = config.public.apiBase || "http://localhost:8000/api";
+  const router = useRouter()
+  const userCookie = useCookie<User | null>('user_data')
 
-  const initUser = () => {
-    if (process.client) {
-      const userJson = localStorage.getItem("user");
-      const token = localStorage.getItem("auth_token");
-      if (userJson && token) {
-        try {
-          userState.value = JSON.parse(userJson);
-        } catch (e) {
-          localStorage.removeItem("user");
-          userState.value = null;
-        }
-      }
-    }
-  };
-  if (process.client && !userState.value) {
-    initUser();
-  }
-  //login
-  const login = async (
-    email: string,
-    password: string,
-  ): Promise<LoginResult> => {
+  //expose userState
+  const userState = computed(() => userCookie.value)
+
+  // Login
+  const login = async (email: string, password: string): Promise<LoginResult> => {
     try {
-      const response = await $fetch<LoginResponse>(`${API_URL}/login`, {
-        method: "POST",
+      const response = await $fetch<LoginResponse>('/api/auth/login', {
+        method: 'POST',
+        body: { email, password },
+      })
 
-        body: {
-          email,
+      if (response.success) {
+        //Cookie di set server
+        //Redirect ke /dashboard
+        router.push('/dashboard')
 
-          password,
-        },
-      });
-
-      if (response.access_token) {
-        // Store token and user data
-        localStorage.setItem("auth_token", response.access_token);
-        localStorage.setItem("user", JSON.stringify(response.user));
-        userState.value = response.user;
-        // Redirect ke /dashboard saja
-        // Biarkan dashboard/index.vue yang handle redirect ke role masing-masing
-        router.push("/dashboard");
-        return { success: true, user: response.user };
+        return { success: true, user: response.user }
       }
 
-      return { success: false, error: "Invalid response from server" };
+      return { success: false, error: 'Invalid response from server' }
     } catch (error: any) {
-      console.error("Login error:", error);
+      console.error('Login error:', error)
       return {
         success: false,
-        error:
-          error.data?.message || "Login failed. Please check your credentials.",
-      };
+        error: error.data?.message || 'Login failed. Please check your credentials.'
+      }
     }
-  };
-  //Logout
+  }
+
+  // Logout
   const logout = async (): Promise<void> => {
     try {
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        await $fetch(`${API_URL}/logout`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      }
+      await $fetch('/api/auth/logout', {
+        method: 'POST',
+      })
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error('Logout error:', error)
     } finally {
-      //hapus storage lokal
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("user");
-      userState.value = null;
-      router.push("/");
+      //clear cookies user di clientside
+      userCookie.value = null
+      router.push('/')
     }
-  };
-  //get user by roles
+  }
 
-
-  //get current user
+  // current user dari cookie
   const getCurrentUser = (): User | null => {
-    return userState.value;
-  };
-  //cek user sudah terautentikasi
+    if (process.client) {
+      return userCookie.value
+    }
+    return null
+  }
+
+  //cek user terautentikasi
   const isAuthenticated = (): boolean => {
-    return !!userState.value;
-  };
-  //get autentikasi token
+    if (process.client) {
+      // cek cookiesny ada atau nggak
+      return !!userCookie.value
+    }
+    return false
+  }
+
+  // get token httpOnly (server side only gbs diakses dari client si tokenny)
   const getToken = (): string | null => {
-    return localStorage.getItem("auth_token");
-  };
+    //gpp null, tiap request pasti si token kekirim
+    return null
+  }
+
   return {
     userState,
-    initUser,
     login,
     logout,
     getCurrentUser,
     isAuthenticated,
     getToken,
-  };
-};
+  }
+}

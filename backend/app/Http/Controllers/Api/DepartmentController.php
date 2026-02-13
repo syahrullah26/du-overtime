@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class DepartmentController extends Controller
 {   
     /**
-     * Display a listing of departments.     
+     * list dept.   
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -23,7 +23,7 @@ class DepartmentController extends Controller
     }
 
     /**
-     * Store a newly created department.
+     * bkin dept bru.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -43,7 +43,7 @@ class DepartmentController extends Controller
     }
 
     /**
-     * Display the specified department.
+     * show dept.
      *
      * @param string $id
      * @return \Illuminate\Http\JsonResponse
@@ -58,7 +58,7 @@ class DepartmentController extends Controller
     }
 
     /**
-     * Update the specified department.
+     * updt dept.
      *
      * @param Request $request
      * @param string $id
@@ -81,7 +81,7 @@ class DepartmentController extends Controller
     }
 
     /**
-     * Remove the specified department.
+     * dlete dept.
      *
      * @param string $id
      * @return \Illuminate\Http\JsonResponse
