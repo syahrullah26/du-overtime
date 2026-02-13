@@ -4,10 +4,8 @@ interface SelectOption {
   value: string | number;
 }
 
-const { userState, getToken } = useAuth();
+const { userState } = useAuth();
 const { fetchUsersByRole } = useUser();
-
-const TestToken = getToken();
 
 const picOptions = ref<SelectOption[]>([]);
 const clevelOptions = ref<SelectOption[]>([]);
@@ -34,8 +32,8 @@ const { pending } = useAsyncData(
   async () => {
     if (userState.value) {
       const [pics, clevels] = await Promise.all([
-        fetchUsersByRole("pic"),
-        fetchUsersByRole("c-level"),
+        fetchUsersByRole("PIC"),
+        fetchUsersByRole("C_LEVEL"),
       ]);
       picOptions.value = pics;
       clevelOptions.value = clevels;
@@ -46,10 +44,6 @@ const { pending } = useAsyncData(
     server: false,
   },
 );
-
-console.log("TOKEN :", TestToken);
-console.log("DATA PIC", picOptions.value);
-console.log("DATA CLEVEL", clevelOptions.value);
 
 const handleSubmit = () => {
   console.log("Data yang akan dikirim:", form.value);
