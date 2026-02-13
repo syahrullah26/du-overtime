@@ -15,6 +15,7 @@ interface LoginResult {
 export const useAuth = () => {
   const router = useRouter();
   const userCookie = useCookie<User | null>("user_data");
+  const tokenCookie = useCookie<string | null>("auth_token");
 
   //expose userState
   const userState = computed(() => userCookie.value);

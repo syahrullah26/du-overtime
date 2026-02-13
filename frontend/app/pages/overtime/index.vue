@@ -1,31 +1,25 @@
 <script setup lang="ts">
-import { useUser } from "~/composables/useUser";
+interface SelectOption {
+  label: string;
+  value: string | number;
+}
 
-const { userState } = useAuth();
+const { userState, getToken } = useAuth();
 const { fetchUsersByRole } = useUser();
 
-const picOptions = ref([]);
-const clevelOptions = ref([]);
+const TestToken = getToken();
 
-const { pending } = useAsyncData("load-roles", async () => {
-  if (userState.value) {
-    const [pics, clevels] = await Promise.all([
-      fetchUsersByRole("pic"),
-      fetchUsersByRole("c-level"),
-    ]);
-    picOptions.value = pics;
-    clevelOptions.value = clevels;
-  }
-  return true;
-});
+const picOptions = ref<SelectOption[]>([]);
+const clevelOptions = ref<SelectOption[]>([]);
 
-//ambil data user login
-const name = computed(() => userState.value?.name);
-const role = computed(() => userState.value?.role);
+//get name dan role
+const name = computed(() => userState.value?.name || "");
+const role = computed(() => userState.value?.role || "");
 
+// Form State
 const form = ref({
-  name: "",
-  position: "",
+  name: userState.value?.name || "",
+  position: userState.value?.role || "",
   date: "",
   startTime: "",
   endTime: "",
@@ -33,6 +27,33 @@ const form = ref({
   pic: "",
   clevel: "",
 });
+
+// Fetch data PIC dan C-Level
+const { pending } = useAsyncData(
+  "load-roles",
+  async () => {
+    if (userState.value) {
+      const [pics, clevels] = await Promise.all([
+        fetchUsersByRole("pic"),
+        fetchUsersByRole("c-level"),
+      ]);
+      picOptions.value = pics;
+      clevelOptions.value = clevels;
+    }
+    return true;
+  },
+  {
+    server: false,
+  },
+);
+
+console.log("TOKEN :", TestToken);
+console.log("DATA PIC", picOptions.value);
+console.log("DATA CLEVEL", clevelOptions.value);
+
+const handleSubmit = () => {
+  console.log("Data yang akan dikirim:", form.value);
+};
 </script>
 <template>
   <div class="min-h-screen bg-[var(--white-bone)] p-8">
