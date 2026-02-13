@@ -1,8 +1,8 @@
 <script setup lang="ts">
-const { userState, initUser } = useAuth();
+const { userState } = useAuth();
 const { submissions, fetchSubmissions, loading } = useOvertime();
 
-definePageMeta({ middleware: "auth" });
+
 
 onMounted(async () => {
   await fetchSubmissions();
