@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { userState } = useAuth();
-const { submissions, fetchSubmissions, loading } = useOvertime();
+const { fetchSubmissions, submissions, submitLoading } = useOvertime();
 
 onMounted(async () => {
   await fetchSubmissions();

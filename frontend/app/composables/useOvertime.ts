@@ -1,57 +1,38 @@
 import type { OvertimeSubmission } from "~/types/auth";
 
 export const useOvertime = () => {
-  const { getToken } = useAuth();
-  const config = useRuntimeConfig();
-  const API_URL = config.public.apiBase || "http://localhost:8000/api";
-
-  const submissions = useState<OvertimeSubmission[]>(
-    "overtime_submissions",
-    () => [],
-  );
-  const loading = useState<boolean>("overtime_loading", () => false);
-
-  //get submissions
+  const submitLoading = ref(false);
   const fetchSubmissions = async () => {
-    const token = getToken();
-    if (!token) return;
-
-    loading.value = true;
     try {
-      const data = await $fetch<OvertimeSubmission[]>(
-        `${API_URL}/overtime-submissions`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        },
-      );
-      submissions.value = data;
-    } catch (error) {
-      console.error("Failed to fetch overtime:", error);
-    } finally {
-      loading.value = false;
+      const response = await useApiFetch<any>(`/overtime-submissions`);
+      const overtimeData = response.data || response;
+      if (!Array.isArray(overtimeData)) {
+        console.warn(`Data untuk overtime bukan array:`, overtimeData);
+        return [];
+      }
+      return overtimeData;
+    } catch (error: any) {
+      console.error(`Error Fetching Overtime:`, error.data || error.message);
     }
   };
-
-  //pengajuan
-  const submitOvertime = async (payload: Partial<OvertimeSubmission>) => {
+  const submissions = async (payload: any) => {
+    submitLoading.value = true;
     try {
-      return await $fetch(`${API_URL}/overtime-submissions`, {
+      const response = await useApiFetch<any>(`/overtime-submissions`, {
         method: "POST",
         body: payload,
-        headers: { Authorization: `Bearer ${getToken()}` },
       });
-    } catch (error) {
-      throw error;
+      return { success: true, data: response };
+    } catch (error: any) {
+      console.error(`Error Submitting Overtime:`, error.data || error.message);
+      return { success: false, error: error.data || error.message };
+    } finally {
+      submitLoading.value = false;
     }
   };
-
   return {
-    submissions,
-    loading,
     fetchSubmissions,
-    submitOvertime,
+    submissions,
+    submitLoading,
   };
 };

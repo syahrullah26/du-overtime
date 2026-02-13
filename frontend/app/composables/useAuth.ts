@@ -26,7 +26,7 @@ export const useAuth = () => {
     password: string,
   ): Promise<LoginResult> => {
     try {
-      const response = await $fetch<LoginResponse>("/api/auth/login", {
+      const response = await $fetch<LoginResponse>("/api/login", {
         method: "POST",
         body: { email, password },
       });
@@ -53,7 +53,7 @@ export const useAuth = () => {
   // Logout
   const logout = async (): Promise<void> => {
     try {
-      await $fetch("/api/auth/logout", {
+      await $fetch("/api/logout", {
         method: "POST",
       });
     } catch (error) {
