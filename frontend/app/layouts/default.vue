@@ -2,16 +2,13 @@
 import sideBar from "../components/sidebar/sideBar.vue";
 import footerDefault from "../components/footer/footerDefault.vue";
 const isSidebarOpen = useState("sidebar-toggle", () => true);
-definePageMeta({
-  middleware: "auth",
-  roles: ["EMPLOYEE", "HRD", "FINANCE", "PIC", "C_LEVEL"],
-});
+// definePageMeta({
+//   middleware: "auth",
+// });
 </script>
-
 <template>
   <div class="min-h-screen bg-[var(--white-bone)] text-zinc-100">
     <sideBar />
-
     <div
       class="transition-all duration-300 min-h-screen"
       :class="[isSidebarOpen ? 'lg:ml-64' : 'lg:ml-20', 'pt-16 lg:pt-0']"
