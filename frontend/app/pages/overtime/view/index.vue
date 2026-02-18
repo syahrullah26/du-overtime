@@ -3,7 +3,11 @@ import { ref, computed } from "vue";
 import OvertimeTable from "~/components/ui/OvertimeTable.vue";
 import Stepper from "~/components/ui/Stepper.vue";
 import StatsCard from "~/components/ui/StatsCard.vue";
-const activeTab = ref("process");
+import { on } from "node:cluster";
+import type { OvertimeSubmission } from "~/types/auth";
+const activeTab = ref("PENDING_PIC");
+
+const { submissions, fetchSubmissions, loading } = useOvertime();
 
 const period = [
   {
@@ -12,63 +16,109 @@ const period = [
     icon: "🕒",
   },
 ];
-const stats = [
-  {
-    label: "Overtime Request",
-    value: "1 Pending",
-    icon: "📄",
-  },
-  { label: "Overtime Approve", value: "1 Approve", icon: "✅" },
-  { label: "Overtime Rejected", value: "1 Reject", icon: "❌" },
-];
+const stats = computed(() => {
+  const totalGross = submissions.value.reduce(
+    (acc, curr) => acc + (curr.total_pay || 0),
+    0,
+  );
+  const pendingCount = submissions.value.filter((s) =>
+    s.status.startsWith("PENDING"),
+  ).length;
 
-const submissions = [
-  {
-    id: 1,
-    date: "20 Okt 2024",
-    duration: "4 Jam",
-    nama: "Galuh Anjani Garnisaputri",
-    pic_status: "done",
-    clevel_status: "process",
-    hrd_status: "pending",
-    amount: "Rp 200.000",
-    status: "process",
-  },
-  {
-    id: 2,
-    date: "18 Okt 2024",
-    duration: "2 Jam",
-    nama: "Galuh Anjani Garnisaputri",
-    pic_status: "done",
-    clevel_status: "done",
-    hrd_status: "done",
-    amount: "Rp 100.000",
-    status: "done",
-  },
-  {
-    id: 3,
-    date: "18 Okt 2024",
-    duration: "2 Jam",
-    nama: "Muhammad Syahrullah",
-    pic_status: "process",
-    clevel_status: "pending",
-    hrd_status: "rejected",
-    amount: "Rp 100.000",
-    status: "rejected",
-  },
-];
+  return [
+    {
+      label: "Total Pengajuan",
+      value: `${submissions.value.length} Data`,
+      icon: "🕒",
+    },
+    { label: "Status Pengajuan", value: `${pendingCount} Pending`, icon: "📄" },
+    {
+      label: "Total Lembur (Gross)",
+      value: formatCurrency(totalGross),
+      icon: "💰",
+    },
+  ];
+});
+
+// const submissions = ref<OvertimeSubmission[]>([]);
+// const submissions = [
+//   {
+//     id: 1,
+//     date: "20 Okt 2024",
+//     duration: "4 Jam",
+//     nama: "Galuh Anjani Garnisaputri",
+//     pic_status: "done",
+//     clevel_status: "process",
+//     hrd_status: "pending",
+//     amount: "Rp 200.000",
+//     status: "process",
+//   },
+//   {
+//     id: 2,
+//     date: "18 Okt 2024",
+//     duration: "2 Jam",
+//     nama: "Galuh Anjani Garnisaputri",
+//     pic_status: "done",
+//     clevel_status: "done",
+//     hrd_status: "done",
+//     amount: "Rp 100.000",
+//     status: "done",
+//   },
+//   {
+//     id: 3,
+//     date: "18 Okt 2024",
+//     duration: "2 Jam",
+//     nama: "Muhammad Syahrullah",
+//     pic_status: "process",
+//     clevel_status: "pending",
+//     hrd_status: "rejected",
+//     amount: "Rp 100.000",
+//     status: "rejected",
+//   },
+// ];
 
 const searchQuery = ref("");
-
 const filteredSubmissions = computed(() => {
-  return submissions.filter((item) => {
+  if (!submissions.value) return [];
+
+  return submissions.value.filter((item: OvertimeSubmission) => {
     const matchTab = item.status === activeTab.value;
+    const searchTerm = searchQuery.value.toLowerCase();
+    const employeeName = item.employee?.name?.toLowerCase() || "";
+    const submissionDate = item.date?.toLowerCase() || "";
+
     const matchSearch =
-      item.nama.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      item.date.toLowerCase().includes(searchQuery.value.toLowerCase());
+      employeeName.includes(searchTerm) || submissionDate.includes(searchTerm);
 
     return matchTab && matchSearch;
   });
+});
+
+const getStepperStatus = (
+  item: OvertimeSubmission,
+  level: "PIC" | "CLEVEL" | "HRD",
+) => {
+  const status = item.status;
+
+  if (status === "COMPLETED") return "done";
+  if (status === "REJECTED") return "error";
+
+  if (level === "PIC") {
+    return status === "PENDING_PIC" ? "process" : "done";
+  }
+  if (level === "CLEVEL") {
+    if (status === "PENDING_PIC") return "pending";
+    return status === "PENDING_C_LEVEL" ? "process" : "done";
+  }
+  if (level === "HRD") {
+    if (status === "PENDING_HRD") return "process";
+    return "pending";
+  }
+  return "pending";
+};
+
+onMounted(async () => {
+  await fetchSubmissions();
 });
 </script>
 <template>
@@ -108,22 +158,24 @@ const filteredSubmissions = computed(() => {
 
       <div class="flex gap-8 justify-center items-center my-4 mx-4">
         <button
-          @click="activeTab = 'process'"
+          @click="activeTab = 'PENDING_PIC'"
           :class="[
             'pb-4 px-2 text-sm font-bold transition-all relative flex items-center gap-2',
-            activeTab === 'process'
+            activeTab === 'PENDING_PIC'
               ? 'text-[var(--gold-main)]'
               : 'text-gray-400 hover:text-gray-600',
           ]"
         >
           Overtime Request
           <div
-            v-if="activeTab === 'process'"
+            v-if="
+              activeTab === 'PENDING_PIC' || 'PENDING_C_LEVEL' || 'PENDING_HRD'
+            "
             class="absolute bottom-0 left-0 w-full h-1 bg-[var(--gold-main)] rounded-t-full"
           ></div>
         </button>
         <button
-          @click="activeTab = 'done'"
+          @click="activeTab = 'COMPLETED'"
           :class="[
             'pb-4 text-sm font-bold transition-all relative',
             activeTab === 'done'
@@ -133,22 +185,22 @@ const filteredSubmissions = computed(() => {
         >
           Your Overtime History
           <div
-            v-if="activeTab === 'done'"
+            v-if="activeTab === 'COMPLETED'"
             class="absolute bottom-0 left-0 w-full h-1 bg-[var(--gold-main)] rounded-t-full"
           ></div>
         </button>
         <button
-          @click="activeTab = 'rejected'"
+          @click="activeTab = 'REJECTED'"
           :class="[
             'pb-4 text-sm font-bold transition-all relative',
-            activeTab === 'rejected'
+            activeTab === 'REJECTED'
               ? 'text-[var(--gold-main)]'
               : 'text-gray-400 hover:text-gray-600',
           ]"
         >
           Your Overtime Rejected
           <div
-            v-if="activeTab === 'rejected'"
+            v-if="activeTab === 'REJECTED'"
             class="absolute bottom-0 left-0 w-full h-1 bg-[var(--gold-main)] rounded-t-full"
           ></div>
         </button>
@@ -170,21 +222,23 @@ const filteredSubmissions = computed(() => {
             class="hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
           >
             <td class="p-6 font-medium text-gray-700 whitespace-nowrap">
-              {{ item.date }}
+              {{ formatDate(item.date) }}
             </td>
-            <td class="p-6 text-gray-500">{{ item.duration }}</td>
-            <td class="p-6 text-gray-500 font-medium">{{ item.nama }}</td>
+            <td class="p-6 text-gray-500">{{ item.duration_min }}</td>
+            <td class="p-6 text-gray-500 font-medium">
+              {{ item.employee?.name }}
+            </td>
             <td class="p-6">
               <Stepper
-                :pic-status="item.pic_status"
-                :clevel-status="item.clevel_status"
-                :hrd-status="item.hrd_status"
+                :pic-status="getStepperStatus(item, 'PIC')"
+                :clevel-status="getStepperStatus(item, 'CLEVEL')"
+                :hrd-status="getStepperStatus(item, 'HRD')"
               />
             </td>
             <td
               class="p-6 text-right text-[var(--gold-dark)] font-black text-lg"
             >
-              {{ item.amount }}
+              {{ formatCurrency(item.total_pay) }}
             </td>
             <td class="p-6">
               <div class="flex justify-center items-center gap-2">
@@ -198,7 +252,7 @@ const filteredSubmissions = computed(() => {
                 </template>
                 <template
                   v-else-if="
-                    activeTab === 'rejected' || activeTab === 'process'
+                    activeTab === 'REJECTED' || activeTab === 'PIC_PENDING'||'CLEVEL_PENDING'||'HRD_PENDING'
                   "
                 >
                   <NuxtLink

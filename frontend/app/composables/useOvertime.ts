@@ -27,7 +27,7 @@ export const useOvertime = () => {
 
       if (!Array.isArray(submissionsData)) {
         console.warn("Overtime data is not an array:", submissionsData);
-        submissions.value = [];
+        submissionsData.value = [];
         return [];
       }
 

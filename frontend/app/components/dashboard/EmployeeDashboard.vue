@@ -114,7 +114,9 @@ const getStepperStatus = (
             :key="item.id"
             class="hover:bg-[var(--white-bone)] transition-colors border-b border-gray-50 last:border-0"
           >
-            <td class="p-6 font-medium text-gray-700">{{ item.date }}</td>
+            <td class="p-6 font-medium text-gray-700">
+              {{ formatDate(item.date) }}
+            </td>
             <td class="p-6 text-gray-500">{{ item.duration_min }} Min</td>
             <td class="p-6">
               <Stepper
