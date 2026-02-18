@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\GlobalSettingController;
 use App\Http\Controllers\Api\OvertimeSubmissionController;
+use App\Http\Controllers\Api\OvertimeLogController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/overtime-submissions/{id}', [OvertimeSubmissionController::class, 'show']);
     Route::put('/overtime-submissions/{id}', [OvertimeSubmissionController::class, 'update']);
     Route::delete('/overtime-submissions/{id}', [OvertimeSubmissionController::class, 'destroy']);
+
+    // Overtime Logs
+    Route::get('/overtime-logs', [OvertimeLogController::class, 'index']);
 
     // Approval actions
     Route::post('/overtime-submissions/{id}/approve', [OvertimeSubmissionController::class, 'approve']);

@@ -40,6 +40,9 @@ class OvertimeSubmissionController extends Controller
             $query->byEmployee($request->user()->id);
         }
 
+        //superadmin no filter
+
+
         // Filter pending pengajuan dari PIC, C_LEVEL, HRD
         if ($request->has('pending_for_me') && $request->pending_for_me) {
             $statusMap = [
@@ -264,7 +267,7 @@ class OvertimeSubmissionController extends Controller
             ], 403);
         }
 
-        if ($submission->employee_id !== $request->user()->id && $request->user()->role !== 'HRD') {
+        if ($submission->employee_id !== $request->user()->id && !in_array($request->user()->role, ['HRD', 'SUPERADMIN'])) {
             return response()->json([
                 'message' => 'Unauthorized to delete this submission',
             ], 403);
@@ -289,6 +292,7 @@ class OvertimeSubmissionController extends Controller
         if ($request->user()->role === 'EMPLOYEE') {
             $query->byEmployee($request->user()->id);
         }
+
 
         // filter tanggal
         if ($request->has('start_date') && $request->has('end_date')) {

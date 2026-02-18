@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
-  role: "EMPLOYEE" | "PIC" | "C_LEVEL" | "HRD" | "FINANCE";
+  role: "EMPLOYEE" | "PIC" | "C_LEVEL" | "HRD" | "FINANCE" | "SUPERADMIN";
   dept_id: string;
   department?: Department;
   created_at?: string;
@@ -61,11 +61,19 @@ export type OvertimeStatus =
   | "COMPLETED"
   | "REJECTED";
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  current_page: number;
+  last_page: number;
+  total: number;
+  per_page: number;
+}
+
 export interface OvertimeLog {
   id: string;
   submission_id: string;
   action_by: string;
-  action_by_user?: string;
+  action_by_user?: User;
   action: string;
   old_status: string | null;
   new_status: string;

@@ -69,8 +69,8 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // bolehin user update profilenya sendiri, ditambah hrd
-        if ($request->user()->id !== $id && $request->user()->role !== 'HRD') {
+        // bolehin user update profilenya sendiri, ditambah hrd dan superadmin
+        if ($request->user()->id !== $id && !in_array($request->user()->role, ['HRD', 'SUPERADMIN'])) {
             return response()->json([
                 'message' => 'Unauthorized to update this user',
             ], 403);
@@ -82,10 +82,10 @@ class UserController extends Controller
             'dept_id' => 'nullable|uuid|exists:departments,id',
         ]);
 
-        // cm hrd yg bs apdet role
-        if ($request->has('role') && $request->user()->role === 'HRD') {
+        // cm hrd/superadmin yg bs apdet role
+        if ($request->has('role') && in_array($request->user()->role, ['HRD', 'SUPERADMIN'])) {
             $request->validate([
-                'role' => 'in:EMPLOYEE,PIC,C_LEVEL,HRD,FINANCE',
+                'role' => 'in:EMPLOYEE,PIC,C_LEVEL,HRD,FINANCE,SUPERADMIN',
             ]);
             $validated['role'] = $request->role;
         }
@@ -146,8 +146,8 @@ class UserController extends Controller
      */
     public function destroy(Request $request, string $id)
     {
-        // cm hr yg bs dlt user
-        if ($request->user()->role !== 'HRD') {
+        // cm hrd/superadmin yg bs dlt user
+        if (!in_array($request->user()->role, ['HRD', 'SUPERADMIN'])) {
             return response()->json([
                 'message' => 'Unauthorized to delete users',
             ], 403);

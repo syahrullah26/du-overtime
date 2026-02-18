@@ -186,7 +186,14 @@ onMounted(async () => {
             <td class="p-6 font-medium text-gray-700 whitespace-nowrap">
               {{ formatDate(item.date) }}
             </td>
-            <td class="p-6 text-gray-500">{{ item.duration_min }}</td>
+            <td class="p-6 text-gray-500">
+              <span class="font-bold"
+                >{{ formatTime(item.start_time) }} -
+                {{ formatTime(item.end_time) }}
+              </span>
+              : {{ Math.floor(item.duration_min / 60) }}j
+              {{ item.duration_min % 60 }}m
+            </td>
             <td class="p-6 text-gray-500 font-medium">
               {{ item.employee?.name }}
             </td>

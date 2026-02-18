@@ -193,26 +193,27 @@ const getStepperStatus = (
             </td>
             <td class="p-6">
               <div class="flex justify-center items-center gap-3">
-                <button
-                  title="Lihat Detail"
-                  class="p-2 hover:scale-125 transition-all text-lg"
+                <NuxtLink
+                  class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
+                  ><button class="hover:scale-125 transition-all">
+                    🔍
+                  </button></NuxtLink
                 >
-                  🔍
-                </button>
-
                 <template v-if="activeTab === 'process'">
-                  <button
-                    title="Approve"
-                    class="p-2 hover:scale-125 transition-all text-lg shadow-sm rounded-lg bg-green-50"
+                  <NuxtLink
+                    class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)] hover:bg-green-50"
                   >
-                    ✅
-                  </button>
-                  <button
-                    title="Reject"
-                    class="p-2 hover:scale-125 transition-all text-lg shadow-sm rounded-lg bg-red-50"
+                    <button title="Approve" class="bg-green-50 rounded-lg">
+                      ✅
+                    </button></NuxtLink
                   >
-                    ❌
-                  </button>
+                  <NuxtLink
+                    class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)] hover:bg-red-50"
+                  >
+                    <button title="Reject" class="bg-red-50 rounded-lg">
+                      ❌
+                    </button>
+                  </NuxtLink>
                 </template>
               </div>
             </td>
