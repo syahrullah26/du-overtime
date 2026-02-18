@@ -70,6 +70,9 @@ class OvertimeSubmissionController extends Controller
             'date' => 'required|date',
             'start_time' => 'required|date_format:Y-m-d H:i:s',
             'end_time' => 'required|date_format:Y-m-d H:i:s|after:start_time',
+            'reason' => 'required|string',
+            'pic_id' => 'required|uuid|exists:users,id',
+            'clevel_id' => 'required|uuid|exists:users,id',
         ]);
 
         $submission = new OvertimeSubmission($validated);
@@ -147,6 +150,9 @@ class OvertimeSubmissionController extends Controller
             'date' => 'sometimes|date',
             'start_time' => 'sometimes|date_format:Y-m-d H:i:s',
             'end_time' => 'sometimes|date_format:Y-m-d H:i:s|after:start_time',
+            'reason' => 'sometimes|string',
+            'pic_id' => 'sometimes|uuid|exists:users,id',
+            'clevel_id' => 'sometimes|uuid|exists:users,id',
         ]);
 
         $submission->update($validated);

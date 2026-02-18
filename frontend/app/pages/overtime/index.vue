@@ -72,16 +72,15 @@ const handleSubmit = async () => {
       name: form.value.name,
       role: form.value.position,
       date: form.value.date,
-      start_time: form.value.startTime,
-      end_time: form.value.endTime,
+      start_time: `${form.value.date} ${form.value.startTime}:00`,
+      end_time: `${form.value.date} ${form.value.endTime}:00`,
       reason: form.value.reason,
       pic_id: form.value.pic,
       clevel_id: form.value.clevel,
     };
     const result = await submitOvertime(overtimePayload);
-
-    if (!result.success) {
-      errorMessage.value = result.error || "Submission failed";
+    if (result) {
+      navigateTo("/overtime/view");
     }
   } catch (error) {
     errorMessage.value = "error";

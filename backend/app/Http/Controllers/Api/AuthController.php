@@ -83,7 +83,9 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         //apus token
-        $request->user()->currentAccessToken()->delete();
+        if ($request->user()) {
+            $request->user()->currentAccessToken()->delete();
+        }
         
         //clearsession
         Auth::guard('web')->logout();

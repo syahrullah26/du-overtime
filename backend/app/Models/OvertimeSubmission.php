@@ -24,6 +24,9 @@ class OvertimeSubmission extends Model
         'end_time',
         'duration_min',
         'status',
+        'reason',
+        'pic_id',
+        'clevel_id',
         'signature_pic',
         'signature_clevel',
         'signature_hrd',
@@ -72,6 +75,22 @@ class OvertimeSubmission extends Model
     }
 
     /**
+     * Get the PIC for this submission.
+     */
+    public function pic(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'pic_id');
+    }
+
+    /**
+     * Get the C-Level for this submission.
+     */
+    public function clevel(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'clevel_id');
+    }
+
+    /**
      * Calculate and set total pay based on duration and flat rate.
      */
     public function calculateTotalPay(): void
@@ -86,9 +105,15 @@ class OvertimeSubmission extends Model
      */
     public function calculateDuration(): void
     {
+        if (!$this->start_time || !$this->end_time) {
+            return;
+        }
+
         $start = \Carbon\Carbon::parse($this->start_time);
         $end = \Carbon\Carbon::parse($this->end_time);
-        $this->duration_min = $end->diffInMinutes($start);
+        
+        // Ensure duration is non-negative and absolute
+        $this->duration_min = $end->diffInMinutes($start, true);
     }
 
     /**
