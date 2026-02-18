@@ -66,11 +66,12 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
+            'success' => true,
             'message' => 'Login successful',
             'user' => $user->load('department'),
             'access_token' => $token,
             'token_type' => 'Bearer',
-        ]);
+        ])->cookie('auth_token', $token, 120, null, null, false, true); // 120 minutes, httpOnly: true
     }
 
     /**
@@ -90,8 +91,9 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json([
+            'success' => true,
             'message' => 'Logged out successfully',
-        ]);
+        ])->withoutCookie('auth_token');
     }
     
     /**

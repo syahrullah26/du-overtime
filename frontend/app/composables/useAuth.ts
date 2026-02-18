@@ -26,13 +26,16 @@ export const useAuth = () => {
     password: string,
   ): Promise<LoginResult> => {
     try {
-      const response = await $fetch<LoginResponse>("/api/auth/login", {
+      const response = await useApiFetch<LoginResponse>("/login", {
         method: "POST",
         body: { email, password },
       });
 
       if (response.success) {
-        //Cookie di set server
+        //Cookie di set server (auth_token)
+        //Set user data cookie untuk persistence di client/middleware
+        userCookie.value = response.user;
+
         //Redirect ke /dashboard
         router.push("/dashboard");
 
@@ -53,7 +56,7 @@ export const useAuth = () => {
   // Logout
   const logout = async (): Promise<void> => {
     try {
-      await $fetch("/api/auth/logout", {
+      await useApiFetch("/logout", {
         method: "POST",
       });
     } catch (error) {
