@@ -1,10 +1,16 @@
 import type { OvertimeSubmission } from "~/types/auth";
+interface OvertimePayload {
+  name: string;
+  role: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  reason: string;
+  pic_id: string;
+  clevel_id: string;
+}
 
 export const useOvertime = () => {
-  const { getToken } = useAuth();
-  const config = useRuntimeConfig();
-  const API_URL = config.public.apiBase || "http://localhost:8000/api";
-
   const submissions = useState<OvertimeSubmission[]>(
     "overtime_submissions",
     () => [],
@@ -13,36 +19,31 @@ export const useOvertime = () => {
 
   //get submissions
   const fetchSubmissions = async () => {
-    const token = getToken();
-    if (!token) return;
-
     loading.value = true;
     try {
-      const data = await $fetch<OvertimeSubmission[]>(
-        `${API_URL}/overtime-submissions`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        },
-      );
-      submissions.value = data;
+      const data = await useApiFetch<any>(`/overtime-submissions`);
+      submissions.value = data.data || data;
+      const submissionsData = data.data || data;
+      if (!Array.isArray(submissionsData)) {
+        console.warn("Overtime data is not an array:", submissionsData);
+        return [];
+      }
     } catch (error) {
       console.error("Failed to fetch overtime:", error);
+      return [];
     } finally {
       loading.value = false;
     }
   };
 
   //pengajuan
-  const submitOvertime = async (payload: Partial<OvertimeSubmission>) => {
+  const submitOvertime = async (payload: OvertimePayload) => {
     try {
-      return await $fetch(`${API_URL}/overtime-submissions`, {
+      const response = await useApiFetch<any>(`/overtime-submissions`, {
         method: "POST",
         body: payload,
-        headers: { Authorization: `Bearer ${getToken()}` },
       });
+      return response;
     } catch (error) {
       throw error;
     }

@@ -70,7 +70,7 @@ const handleSubmit = async () => {
     //buat payload
     const overtimePayload = {
       name: form.value.name,
-      position: form.value.position,
+      role: form.value.position,
       date: form.value.date,
       start_time: form.value.startTime,
       end_time: form.value.endTime,
@@ -79,6 +79,10 @@ const handleSubmit = async () => {
       clevel_id: form.value.clevel,
     };
     const result = await submitOvertime(overtimePayload);
+
+    if (!result.success) {
+      errorMessage.value = result.error || "Submission failed";
+    }
   } catch (error) {
     errorMessage.value = "error";
   } finally {
