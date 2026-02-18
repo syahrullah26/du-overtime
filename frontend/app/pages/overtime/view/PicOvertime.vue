@@ -6,47 +6,46 @@ import OvertimeTable from "~/components/ui/OvertimeTable.vue";
 import ProfileCard from "~/components/ui/ProfileCard.vue";
 import { formatCurrency } from "~/utils/helper";
 
-const props = defineProps<{
-  user: any;
-  submissions: OvertimeSubmission[];
-  loading: boolean;
-}>();
-
-const activeTab = ref("process");
+const { userState } = useAuth();
+const { submissions, fetchSubmissions, loading } = useOvertime();
+const activeTab = ref("PENDING_PIC");
 
 // filter active tab
 const filteredData = computed(() => {
-  return props.submissions.filter((item: OvertimeSubmission) => {
-    if (activeTab.value === "process") {
+  if (!submissions.value) return [];
+
+  return submissions.value.filter((item: OvertimeSubmission) => {
+    if (activeTab.value === "PENDING_PIC") {
       return (
-        item.status === "PENDING_PIC" && item.employee_id !== props.user?.id
+        item.status === "PENDING_PIC" &&
+        item.employee_id !== userState.value?.id
       );
     } else {
-      return item.employee_id === props.user?.id;
+      return item.employee_id === userState.value?.id;
     }
   });
 });
 
 const totalProcess = computed(() => {
-  return props.submissions.filter(
+  return submissions.value.filter(
     (item: OvertimeSubmission) =>
-      item.status === "PENDING_PIC" && item.employee_id !== props.user?.id,
+      item.status === "PENDING_PIC" && item.employee_id !== userState.value?.id,
   ).length;
 });
 
 const stats = computed(() => {
-  const totalGross = props.submissions.reduce(
+  const totalGross = submissions.value.reduce(
     (acc, curr) => acc + (curr.total_pay || 0),
     0,
   );
-  const pendingCount = props.submissions.filter((s) =>
+  const pendingCount = submissions.value.filter((s) =>
     s.status.startsWith("PENDING"),
   ).length;
 
   return [
     {
       label: "Total Data Terkait",
-      value: `${props.submissions.length} Data`,
+      value: `${submissions.value.length} Data`,
       icon: "🕒",
     },
     { label: "Total Pending", value: `${pendingCount} Status`, icon: "📄" },
@@ -77,6 +76,10 @@ const getStepperStatus = (
   }
   return "pending";
 };
+
+onMounted(async () => {
+  await fetchSubmissions();
+});
 </script>
 
 <template>
@@ -90,17 +93,7 @@ const getStepperStatus = (
           Panel PIC - Dewa United Indonesia
         </p>
       </div>
-      <NuxtLink
-        to="/overtime"
-        class="bg-[var(--gold-main)] hover:bg-[#b38f4d] text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg flex items-center gap-2"
-      >
-        <span class="text-xl">+</span> Ajukan Lembur
-      </NuxtLink>
     </header>
-
-    <div v-if="user" class="mb-10">
-      <ProfileCard v-bind="user" />
-    </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
       <StatsCard v-for="stat in stats" :key="stat.label" v-bind="stat" />
@@ -113,10 +106,10 @@ const getStepperStatus = (
         class="flex gap-8 justify-center items-center mt-8 border-b border-gray-50"
       >
         <button
-          @click="activeTab = 'process'"
+          @click="activeTab = 'PENDING_PIC'"
           :class="[
             'pb-4 px-2 text-sm font-bold transition-all relative flex items-center gap-2',
-            activeTab === 'process'
+            activeTab === 'PENDING_PIC'
               ? 'text-amber-500'
               : 'text-gray-400 hover:text-gray-600',
           ]"
@@ -129,23 +122,23 @@ const getStepperStatus = (
             {{ totalProcess }}
           </span>
           <div
-            v-if="activeTab === 'process'"
+            v-if="activeTab === 'PENDING_PIC'"
             class="absolute bottom-0 left-0 w-full h-1 bg-amber-500 rounded-t-full"
           ></div>
         </button>
 
         <button
-          @click="activeTab = 'done'"
+          @click="activeTab = 'PENDING_C_LEVEL'"
           :class="[
             'pb-4 text-sm font-bold transition-all relative',
-            activeTab === 'done'
+            activeTab === 'PENDING_C_LEVEL'
               ? 'text-amber-500'
               : 'text-gray-400 hover:text-gray-600',
           ]"
         >
           Your Overtime
           <div
-            v-if="activeTab === 'done'"
+            v-if="activeTab === 'PENDING_C_LEVEL'"
             class="absolute bottom-0 left-0 w-full h-1 bg-amber-500 rounded-t-full"
           ></div>
         </button>

@@ -1,3 +1,5 @@
+
+// STATUS BADGE ATAU CLASS NYA 
 export const statusClass = (status: string) => {
   const base = "px-2 py-1 rounded-md text-xs font-bold ";
   if (status.startsWith("PENDING"))
@@ -7,6 +9,8 @@ export const statusClass = (status: string) => {
   return base + "bg-gray-100 text-gray-700";
 };
 
+
+//FORMAT RUPIAH
 export const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -15,6 +19,7 @@ export const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
+// FORMAT TANGGAL
 export const formatDate = (date: string | Date | number) => {
   const d = new Date(date);
 
@@ -27,4 +32,22 @@ export const formatDate = (date: string | Date | number) => {
     month: "long",
     year: "numeric",
   });
+};
+
+//FORMAT JAM
+export const formatTime = (date: string | Date | number): string => {
+  if (!date) return "-";
+
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "-";
+    return new Intl.DateTimeFormat("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(d);
+  } catch (error) {
+    console.error("FormatTime Error:", error);
+    return "-";
+  }
 };

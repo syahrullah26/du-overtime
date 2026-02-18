@@ -39,44 +39,6 @@ const stats = computed(() => {
     },
   ];
 });
-
-// const submissions = ref<OvertimeSubmission[]>([]);
-// const submissions = [
-//   {
-//     id: 1,
-//     date: "20 Okt 2024",
-//     duration: "4 Jam",
-//     nama: "Galuh Anjani Garnisaputri",
-//     pic_status: "done",
-//     clevel_status: "process",
-//     hrd_status: "pending",
-//     amount: "Rp 200.000",
-//     status: "process",
-//   },
-//   {
-//     id: 2,
-//     date: "18 Okt 2024",
-//     duration: "2 Jam",
-//     nama: "Galuh Anjani Garnisaputri",
-//     pic_status: "done",
-//     clevel_status: "done",
-//     hrd_status: "done",
-//     amount: "Rp 100.000",
-//     status: "done",
-//   },
-//   {
-//     id: 3,
-//     date: "18 Okt 2024",
-//     duration: "2 Jam",
-//     nama: "Muhammad Syahrullah",
-//     pic_status: "process",
-//     clevel_status: "pending",
-//     hrd_status: "rejected",
-//     amount: "Rp 100.000",
-//     status: "rejected",
-//   },
-// ];
-
 const searchQuery = ref("");
 const filteredSubmissions = computed(() => {
   if (!submissions.value) return [];
@@ -252,7 +214,10 @@ onMounted(async () => {
                 </template>
                 <template
                   v-else-if="
-                    activeTab === 'REJECTED' || activeTab === 'PIC_PENDING'||'CLEVEL_PENDING'||'HRD_PENDING'
+                    activeTab === 'REJECTED' ||
+                    activeTab === 'PIC_PENDING' ||
+                    'CLEVEL_PENDING' ||
+                    'HRD_PENDING'
                   "
                 >
                   <NuxtLink
