@@ -68,14 +68,13 @@ const filteredMenus = computed(() => {
   
   const filterByRole = (items: any[]) => {
     return items.filter((item) => {
-      // If SUPERADMIN, show everything
+      //superadmin liat semua
       if (userRole === "SUPERADMIN") return true;
       
-      // Check if item has role restrictions
       const hasAccess = !item.role || item.role.includes(userRole);
       
       if (hasAccess && item.children) {
-        // Recursively filter children
+        //filter child
         item.children = filterByRole(item.children);
       }
       
@@ -83,7 +82,7 @@ const filteredMenus = computed(() => {
     });
   };
 
-  // Clone menus to avoid mutating the original array
+  // clone menu
   const menusClone = JSON.parse(JSON.stringify(menus));
   return filterByRole(menusClone);
 });
