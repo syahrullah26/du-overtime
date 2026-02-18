@@ -28,35 +28,36 @@ export interface Menu {
   to?: string;
   icon: string;
   roles?: string[];
-  chilren?: Menu[];
+  children?: Menu[];
 }
 const menus = [
   { name: "Dashboard", to: "/", icon: "🏠" },
   {
     name: "Overtime Submission",
     icon: "⏰",
-    role: ["PIC", "EMPLOYEE"],
+    role: ["PIC", "EMPLOYEE", "SUPERADMIN"],
     children: [
       { name: "Overtime", to: "/overtime", icon: "📝" },
       { name: "View Overtime", to: "/overtime/view", icon: "📄" },
+      { name: "Overtime Logs", to: "/overtime/logs", icon: "📋", role: ["SUPERADMIN"] },
     ],
   },
   {
     name: "Approval Finance",
     icon: "💸",
-    role: ["FINANCE"],
+    role: ["FINANCE", "SUPERADMIN"],
     children: [{ name: "View Overtime", to: "/overtime/view", icon: "📄" }],
   },
   {
     name: "Approval HRD",
     icon: "👨‍💼",
-    role: ["HRD"],
+    role: ["HRD", "SUPERADMIN"],
     children: [{ name: "View Overtime", to: "/overtime/view", icon: "📄" }],
   },
   {
     name: "Approval C-Level",
     icon: "👨‍💼",
-    role: ["C_LEVEL"],
+    role: ["C_LEVEL", "SUPERADMIN"],
     children: [{ name: "View Overtime", to: "/overtime/view", icon: "📄" }],
   },
 ];
@@ -64,10 +65,27 @@ const menus = [
 const filteredMenus = computed(() => {
   if (!userState.value) return [];
   const userRole = userState.value.role;
-  return menus.filter((menu) => {
-    if (!menu.role || menu.role.length === 0) return true;
-    return menu.role.includes(userRole);
-  });
+  
+  const filterByRole = (items: any[]) => {
+    return items.filter((item) => {
+      // If SUPERADMIN, show everything
+      if (userRole === "SUPERADMIN") return true;
+      
+      // Check if item has role restrictions
+      const hasAccess = !item.role || item.role.includes(userRole);
+      
+      if (hasAccess && item.children) {
+        // Recursively filter children
+        item.children = filterByRole(item.children);
+      }
+      
+      return hasAccess;
+    });
+  };
+
+  // Clone menus to avoid mutating the original array
+  const menusClone = JSON.parse(JSON.stringify(menus));
+  return filterByRole(menusClone);
 });
 
 const isActive = (path: string) =>

@@ -14,14 +14,21 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get departments
+        //Get Department
         $itDept = Department::where('name', 'IT')->first();
         $esportsDept = Department::where('name', 'Esports')->first();
         $hrDept = Department::where('name', 'Human Resources')->first();
         $financeDept = Department::where('name', 'Finance')->first();
 
-        // Create demo users for each role
+        //demo users mnya
         $users = [
+            [
+                'name' => 'SUPERADMIN',
+                'email' => 'superadmin@dewaunited.com',
+                'password' => Hash::make('superadmin123'),
+                'role' => 'SUPERADMIN',
+                'dept_id' => null,
+            ],
             [
                 'name' => 'HRD Admin',
                 'email' => 'hrd@dewaunited.com',
