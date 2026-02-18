@@ -111,6 +111,12 @@ const handleSubmit = async () => {
         <h3 class="font-bold text-xl text-gray-800">Form Pengajuan</h3>
       </div>
       <form @submit.prevent="handleSubmit">
+        <div
+          v-if="errorMessage"
+          class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg w-auto mx-4"
+        >
+          <p class="text-sm">⚠️{{ errorMessage }} !</p>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mx-4 my-4">
           <BaseInput
             label="nama"
