@@ -113,6 +113,11 @@ const handleKeyPress = (event: KeyboardEvent) => {
         <p class="text-sm font-semibold text-blue-900 mb-2">Demo Credentials:</p>
         <div class="grid grid-cols-1 gap-2 text-xs text-blue-800">
           <div class="flex justify-between">
+            <span class="font-medium">Superadmin:</span>
+            <span>superadmin@dewaunited.com</span>
+            <span>superadmin123</span>
+          </div>
+          <div class="flex justify-between">
             <span class="font-medium">Finance:</span>
             <span>finance@dewaunited.com</span>
           </div>
