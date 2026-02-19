@@ -44,6 +44,9 @@ export interface OvertimeSubmission {
   end_time: string;
   duration_min: number;
   status: OvertimeStatus;
+  reason: string;
+  pic_id: string;
+  clevel_id: string;
   signature_pic: string | null;
   signature_clevel: string | null;
   signature_hrd: string | null;

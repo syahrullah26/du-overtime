@@ -27,7 +27,7 @@ export const useOvertime = () => {
 
       if (!Array.isArray(submissionsData)) {
         console.warn("Overtime data is not an array:", submissionsData);
-        submissionsData.value = [];
+        submissions.value = [];
         return [];
       }
 
@@ -36,6 +36,20 @@ export const useOvertime = () => {
       console.error("Failed to fetch overtime:", error);
       submissions.value = [];
       return [];
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  //get single submission
+  const getOvertimeById = async (id: string) => {
+    loading.value = true;
+    try {
+      const response = await useApiFetch<any>(`/overtime-submissions/${id}`);
+      return response.data || response;
+    } catch (error) {
+      console.error(`Failed to fetch overtime ${id}:`, error);
+      return null;
     } finally {
       loading.value = false;
     }
@@ -53,10 +67,55 @@ export const useOvertime = () => {
     }
   };
 
+  //update
+  const updateOvertime = async (id: string, payload: Partial<OvertimePayload>) => {
+    try {
+      return await useApiFetch(`/overtime-submissions/${id}`, {
+        method: "PUT",
+        body: payload,
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  //approve
+  const approveOvertime = async (id: string, signature?: File) => {
+    try {
+      const formData = new FormData();
+      if (signature) {
+        formData.append("signature", signature);
+      }
+
+      return await useApiFetch(`/overtime-submissions/${id}/approve`, {
+        method: "POST",
+        body: formData,
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  //reject
+  const rejectOvertime = async (id: string, reason: string) => {
+    try {
+      return await useApiFetch(`/overtime-submissions/${id}/reject`, {
+        method: "POST",
+        body: { reason },
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return {
     submissions,
     loading,
     fetchSubmissions,
+    getOvertimeById,
     submitOvertime,
+    updateOvertime,
+    approveOvertime,
+    rejectOvertime,
   };
 };
