@@ -13,16 +13,11 @@ export const useApiFetch = async <T = any>(
 
     return response as T;
   } catch (error: any) {
-    const status = error.response?.status || error.statusCode;
+    const isAuthUrl = url.includes('/login') || url.includes('/logout')
 
-    if (status === 401) {
-      const requestUrl = error.response?._data?.url || "";
-      const isAuthRoute =
-        requestUrl.includes("/login") || requestUrl.includes("/logout");
-      if (!isAuthRoute) {
-        const { logout } = useAuth();
-        await logout();
-      }
+    if ((error.response?.status === 401 || error.statusCode === 401) && !isAuthUrl) {
+      const { logout } = useAuth()
+      await logout()
     }
 
     throw error;

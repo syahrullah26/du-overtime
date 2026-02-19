@@ -21,12 +21,12 @@ const handleChangePassword = async () => {
     const response = await updatePassword(passwordForm);
     if (response) {
       resetForm();
-      alert("Password Update Succesfully");
+      alert("Password Update Successfully");
     }
-    return response.data || response;
   } catch (error: any) {
-    console.error("Error Update Password:", error.data || error.meessage);
-    return [];
+    console.error("Error Update Password:", error.data || error.message);
+    const message = error.data?.message || "Failed to update password. Please try again.";
+    alert(message);
   }
 };
 </script>

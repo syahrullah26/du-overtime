@@ -62,7 +62,7 @@ export const useUser = () => {
     loading.value = true;
     try {
       const response = await useApiFetch<any>(
-        `/users/${payload.id}/change-password`,
+        `/users/${payload.id}/password`,
         {
           method: "PUT",
           body: payload,
@@ -71,7 +71,7 @@ export const useUser = () => {
       return response.data || response;
     } catch (error: any) {
       console.error("Error updating password:", error.data || error.message);
-      return [];
+      throw error;
     } finally {
       loading.value = false;
     }
