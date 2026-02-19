@@ -12,7 +12,37 @@ const props = defineProps<{
   loading: boolean;
 }>();
 
+const { approveOvertime, rejectOvertime, fetchSubmissions } = useOvertime();
 const activeTab = ref("process");
+
+const handleApprove = async (id: string) => {
+  if (!confirm("Are you sure you want to approve this overtime?")) return;
+  try {
+    await approveOvertime(id);
+    await fetchSubmissions();
+    alert("Overtime approved successfully");
+  } catch (error) {
+    console.error("Failed to approve overtime:", error);
+    alert("Failed to approve overtime");
+  }
+};
+
+const handleReject = async (id: string) => {
+  const reason = prompt("Enter rejection reason:");
+  if (reason === null) return;
+  if (!reason.trim()) {
+    alert("Reason is required for rejection");
+    return;
+  }
+  try {
+    await rejectOvertime(id, reason);
+    await fetchSubmissions();
+    alert("Overtime rejected");
+  } catch (error) {
+    console.error("Failed to reject overtime:", error);
+    alert("Failed to reject overtime");
+  }
+};
 
 // filter active tab
 const filteredData = computed(() => {
@@ -194,26 +224,30 @@ const getStepperStatus = (
             <td class="p-6">
               <div class="flex justify-center items-center gap-3">
                 <NuxtLink
+                  :to="`/overtime/view/${item.id}`"
                   class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
-                  ><button class="hover:scale-125 transition-all">
-                    🔍
-                  </button></NuxtLink
                 >
-                <template v-if="activeTab === 'process'">
-                  <NuxtLink
-                    class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)] hover:bg-green-50"
+                  <button class="hover:scale-125 transition-all">🔍</button>
+                </NuxtLink>
+                <template
+                  v-if="
+                    activeTab === 'process' && item.employee?.id !== user?.id
+                  "
+                >
+                  <button
+                    title="Approve"
+                    class="cursor-pointer hover:bg-green-50 rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-green-400 bg-white"
+                    @click="handleApprove(item.id)"
                   >
-                    <button title="Approve" class="bg-green-50 rounded-lg">
-                      ✅
-                    </button></NuxtLink
+                    ✅
+                  </button>
+                  <button
+                    title="Reject"
+                    class="cursor-pointer hover:bg-red-50 rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-red-400 bg-white"
+                    @click="handleReject(item.id)"
                   >
-                  <NuxtLink
-                    class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)] hover:bg-red-50"
-                  >
-                    <button title="Reject" class="bg-red-50 rounded-lg">
-                      ❌
-                    </button>
-                  </NuxtLink>
+                    ❌
+                  </button>
                 </template>
               </div>
             </td>

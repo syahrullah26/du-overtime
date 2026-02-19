@@ -35,7 +35,11 @@ const menus = [
   {
     name: "Overtime Submission",
     icon: "⏰",
+<<<<<<< HEAD
     role: ["EMPLOYEE"],
+=======
+    role: ["PIC", "EMPLOYEE", "SUPERADMIN"],
+>>>>>>> b3d3cb2c39221f1ca37ef8c870b04f851120111c
     children: [
       { name: "Overtime", to: "/overtime", icon: "📝" },
       { name: "View Overtime", to: "/overtime/view", icon: "📄" },

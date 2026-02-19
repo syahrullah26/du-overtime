@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onMounted, computed } from "vue";
 import type { OvertimeSubmission } from "~/types/auth";
 import StatsCard from "~/components/ui/StatsCard.vue";
 import Stepper from "~/components/ui/Stepper.vue";
@@ -7,10 +8,39 @@ import ProfileCard from "~/components/ui/ProfileCard.vue";
 import { formatCurrency } from "~/utils/helper";
 
 const { userState } = useAuth();
-const { submissions, fetchSubmissions, loading } = useOvertime();
+const { submissions, fetchSubmissions, loading, approveOvertime, rejectOvertime } = useOvertime();
 const activeTab = ref("PENDING_PIC");
 
-// filter active tab
+const handleApprove = async (id: string) => {
+  if (!confirm("Are you sure you want to approve this overtime?")) return;
+  try {
+    await approveOvertime(id);
+    await fetchSubmissions();
+    alert("Overtime approved successfully");
+  } catch (error) {
+    console.error("Failed to approve overtime:", error);
+    alert("Failed to approve overtime");
+  }
+};
+
+const handleReject = async (id: string) => {
+  const reason = prompt("Enter rejection reason:");
+  if (reason === null) return;
+  if (!reason.trim()) {
+    alert("Reason is required for rejection");
+    return;
+  }
+  try {
+    await rejectOvertime(id, reason);
+    await fetchSubmissions();
+    alert("Overtime rejected");
+  } catch (error) {
+    console.error("Failed to reject overtime:", error);
+    alert("Failed to reject overtime");
+  }
+};
+
+//filter tab
 const filteredData = computed(() => {
   if (!submissions.value) return [];
 
@@ -19,6 +49,10 @@ const filteredData = computed(() => {
       return (
         item.status === "PENDING_PIC" &&
         item.employee_id !== userState.value?.id
+      );
+    } else if (activeTab.value === "HISTORY_APPROVAL") {
+      return (
+        item.pic_id === userState.value?.id && item.status !== "PENDING_PIC"
       );
     } else {
       return item.employee_id === userState.value?.id;
@@ -142,6 +176,22 @@ onMounted(async () => {
             class="absolute bottom-0 left-0 w-full h-1 bg-amber-500 rounded-t-full"
           ></div>
         </button>
+
+        <button
+          @click="activeTab = 'HISTORY_APPROVAL'"
+          :class="[
+            'pb-4 text-sm font-bold transition-all relative',
+            activeTab === 'HISTORY_APPROVAL'
+              ? 'text-amber-500'
+              : 'text-gray-400 hover:text-gray-600',
+          ]"
+        >
+          History Approval
+          <div
+            v-if="activeTab === 'HISTORY_APPROVAL'"
+            class="absolute bottom-0 left-0 w-full h-1 bg-amber-500 rounded-t-full"
+          ></div>
+        </button>
       </div>
 
       <OvertimeTable
@@ -187,6 +237,7 @@ onMounted(async () => {
             <td class="p-6">
               <div class="flex justify-center items-center gap-3">
                 <NuxtLink
+                  :to="`/overtime/view/${item.id}`"
                   class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
                   ><button class="hover:scale-125 transition-all">
                     🔍
@@ -199,20 +250,20 @@ onMounted(async () => {
                     item.employee?.id !== userState?.id
                   "
                 >
-                  <NuxtLink
-                    class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)] hover:bg-green-50"
+                  <button
+                    title="Approve"
+                    class="cursor-pointer hover:bg-green-50 rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-green-400 bg-white"
+                    @click="handleApprove(item.id)"
                   >
-                    <button title="Approve" class="bg-green-50 rounded-lg">
-                      ✅
-                    </button></NuxtLink
+                    ✅
+                  </button>
+                  <button
+                    title="Reject"
+                    class="cursor-pointer hover:bg-red-50 rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-red-400 bg-white"
+                    @click="handleReject(item.id)"
                   >
-                  <NuxtLink
-                    class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)] hover:bg-red-50"
-                  >
-                    <button title="Reject" class="bg-red-50 rounded-lg">
-                      ❌
-                    </button>
-                  </NuxtLink>
+                    ❌
+                  </button>
                 </template>
               </div>
             </td>

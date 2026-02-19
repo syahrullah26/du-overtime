@@ -3,10 +3,10 @@ import { ref, computed } from "vue";
 import OvertimeTable from "~/components/ui/OvertimeTable.vue";
 import Stepper from "~/components/ui/Stepper.vue";
 import StatsCard from "~/components/ui/StatsCard.vue";
-import { on } from "node:cluster";
 import type { OvertimeSubmission } from "~/types/auth";
 const activeTab = ref("PENDING_PIC");
 
+const { userState } = useAuth();
 const { submissions, fetchSubmissions, loading } = useOvertime();
 
 const period = [
@@ -44,7 +44,25 @@ const filteredSubmissions = computed(() => {
   if (!submissions.value) return [];
 
   return submissions.value.filter((item: OvertimeSubmission) => {
-    const matchTab = item.status === activeTab.value;
+    let matchTab = false;
+    if (activeTab.value === "APPROVAL_HISTORY") {
+      const role = userState.value?.role;
+      if (role === "PIC") {
+        matchTab =
+          item.pic_id === userState.value?.id && item.status !== "PENDING_PIC";
+      } else if (role === "C_LEVEL") {
+        matchTab =
+          item.clevel_id === userState.value?.id &&
+          !["PENDING_PIC", "PENDING_C_LEVEL"].includes(item.status);
+      } else if (role === "HRD") {
+        matchTab = item.status === "COMPLETED";
+      } else if (role === "SUPERADMIN") {
+        matchTab = item.status === "COMPLETED" || item.status === "REJECTED";
+      }
+    } else {
+      matchTab = item.status === activeTab.value;
+    }
+
     const searchTerm = searchQuery.value.toLowerCase();
     const employeeName = item.employee?.name?.toLowerCase() || "";
     const submissionDate = item.date?.toLowerCase() || "";
@@ -123,16 +141,14 @@ onMounted(async () => {
           @click="activeTab = 'PENDING_PIC'"
           :class="[
             'pb-4 px-2 text-sm font-bold transition-all relative flex items-center gap-2',
-            activeTab === 'PENDING_PIC'
+            ['PENDING_PIC', 'PENDING_C_LEVEL', 'PENDING_HRD'].includes(activeTab)
               ? 'text-[var(--gold-main)]'
               : 'text-gray-400 hover:text-gray-600',
           ]"
         >
           Overtime Request
           <div
-            v-if="
-              activeTab === 'PENDING_PIC' || 'PENDING_C_LEVEL' || 'PENDING_HRD'
-            "
+            v-if="['PENDING_PIC', 'PENDING_C_LEVEL', 'PENDING_HRD'].includes(activeTab)"
             class="absolute bottom-0 left-0 w-full h-1 bg-[var(--gold-main)] rounded-t-full"
           ></div>
         </button>
@@ -140,7 +156,7 @@ onMounted(async () => {
           @click="activeTab = 'COMPLETED'"
           :class="[
             'pb-4 text-sm font-bold transition-all relative',
-            activeTab === 'done'
+            activeTab === 'COMPLETED'
               ? 'text-[var(--gold-main)]'
               : 'text-gray-400 hover:text-gray-600',
           ]"
@@ -148,6 +164,22 @@ onMounted(async () => {
           Your Overtime History
           <div
             v-if="activeTab === 'COMPLETED'"
+            class="absolute bottom-0 left-0 w-full h-1 bg-[var(--gold-main)] rounded-t-full"
+          ></div>
+        </button>
+        <button
+          v-if="userState?.role !== 'EMPLOYEE'"
+          @click="activeTab = 'APPROVAL_HISTORY'"
+          :class="[
+            'pb-4 text-sm font-bold transition-all relative',
+            activeTab === 'APPROVAL_HISTORY'
+              ? 'text-[var(--gold-main)]'
+              : 'text-gray-400 hover:text-gray-600',
+          ]"
+        >
+          History Approval
+          <div
+            v-if="activeTab === 'APPROVAL_HISTORY'"
             class="absolute bottom-0 left-0 w-full h-1 bg-[var(--gold-main)] rounded-t-full"
           ></div>
         </button>
@@ -213,6 +245,7 @@ onMounted(async () => {
               <div class="flex justify-center items-center gap-2">
                 <template v-if="activeTab === 'done'">
                   <NuxtLink
+                    :to="`/overtime/view/${item.id}`"
                     class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
                     ><button class="hover:scale-125 transition-all">
                       🔍
@@ -221,19 +254,19 @@ onMounted(async () => {
                 </template>
                 <template
                   v-else-if="
-                    activeTab === 'REJECTED' ||
-                    activeTab === 'PIC_PENDING' ||
-                    'CLEVEL_PENDING' ||
-                    'HRD_PENDING'
+                    ['REJECTED', 'PENDING_PIC', 'PENDING_C_LEVEL', 'PENDING_HRD', 'APPROVAL_HISTORY', 'COMPLETED'].includes(activeTab)
                   "
                 >
                   <NuxtLink
+                    :to="`/overtime/view/${item.id}`"
                     class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
                     ><button class="hover:scale-125 transition-all">
                       🔍
                     </button></NuxtLink
                   >
                   <NuxtLink
+                    v-if="item.status === 'PENDING_PIC' && item.employee_id === userState?.id"
+                    :to="`/overtime/edit/${item.id}`"
                     class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
                     ><button class="hover:scale-125 transition-all">
                       📝
