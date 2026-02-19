@@ -59,6 +59,15 @@ const filteredSubmissions = computed(() => {
       } else if (role === "SUPERADMIN") {
         matchTab = item.status === "COMPLETED" || item.status === "REJECTED";
       }
+    } else if (activeTab.value === "PENDING_PIC") {
+      const role = userState.value?.role;
+      if (role === "PIC") matchTab = item.status === "PENDING_PIC";
+      else if (role === "C_LEVEL") matchTab = item.status === "PENDING_C_LEVEL";
+      else if (role === "HRD") matchTab = item.status === "PENDING_HRD";
+      else
+        matchTab = ["PENDING_PIC", "PENDING_C_LEVEL", "PENDING_HRD"].includes(
+          item.status,
+        );
     } else {
       matchTab = item.status === activeTab.value;
     }
@@ -74,8 +83,16 @@ const filteredSubmissions = computed(() => {
   });
 });
 
+// const pedingTabs = computed(() =>
+//   ["PENDING_PIC", "PENDING_C_LEVEL", "PENDING_HRD"].includes(activeTab.value),
+// );
+// const setPendingTabs = () => {
+//   activeTab.value = "PENDING_PIC";
+// };
+
 const getStepperStatus = (
   item: OvertimeSubmission,
+
   level: "PIC" | "CLEVEL" | "HRD",
 ) => {
   const status = item.status;
@@ -141,14 +158,20 @@ onMounted(async () => {
           @click="activeTab = 'PENDING_PIC'"
           :class="[
             'pb-4 px-2 text-sm font-bold transition-all relative flex items-center gap-2',
-            ['PENDING_PIC', 'PENDING_C_LEVEL', 'PENDING_HRD'].includes(activeTab)
+            ['PENDING_PIC', 'PENDING_C_LEVEL', 'PENDING_HRD'].includes(
+              activeTab,
+            )
               ? 'text-[var(--gold-main)]'
               : 'text-gray-400 hover:text-gray-600',
           ]"
         >
           Overtime Request
           <div
-            v-if="['PENDING_PIC', 'PENDING_C_LEVEL', 'PENDING_HRD'].includes(activeTab)"
+            v-if="
+              ['PENDING_PIC', 'PENDING_C_LEVEL', 'PENDING_HRD'].includes(
+                activeTab,
+              )
+            "
             class="absolute bottom-0 left-0 w-full h-1 bg-[var(--gold-main)] rounded-t-full"
           ></div>
         </button>
@@ -254,7 +277,14 @@ onMounted(async () => {
                 </template>
                 <template
                   v-else-if="
-                    ['REJECTED', 'PENDING_PIC', 'PENDING_C_LEVEL', 'PENDING_HRD', 'APPROVAL_HISTORY', 'COMPLETED'].includes(activeTab)
+                    [
+                      'REJECTED',
+                      'PENDING_PIC',
+                      'PENDING_C_LEVEL',
+                      'PENDING_HRD',
+                      'APPROVAL_HISTORY',
+                      'COMPLETED',
+                    ].includes(activeTab)
                   "
                 >
                   <NuxtLink
@@ -265,7 +295,10 @@ onMounted(async () => {
                     </button></NuxtLink
                   >
                   <NuxtLink
-                    v-if="item.status === 'PENDING_PIC' && item.employee_id === userState?.id"
+                    v-if="
+                      item.status === 'PENDING_PIC' &&
+                      item.employee_id === userState?.id
+                    "
                     :to="`/overtime/edit/${item.id}`"
                     class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
                     ><button class="hover:scale-125 transition-all">

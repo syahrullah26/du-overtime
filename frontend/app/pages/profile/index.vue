@@ -73,7 +73,7 @@ const handleLogout = async () => {
         </div>
       </header>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div class="grid grid-cols-1 lg:grid-cols-16 gap-10">
         <div class="lg:col-span-8 space-y-8">
           <div
             class="relative bg-white rounded-[2.5rem] p-1 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white overflow-hidden group"
@@ -223,87 +223,6 @@ const handleLogout = async () => {
                 Keluar dari sesi ini
               </p>
             </NuxtLink>
-          </div>
-        </div>
-
-        <div class="lg:col-span-4 space-y-8">
-          <div
-            class="bg-gray-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-2xl"
-          >
-            <div class="relative z-10 space-y-6">
-              <div class="flex justify-between items-start">
-                <div
-                  class="w-12 h-12 bg-[var(--gold-main)] rounded-2xl flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(234,179,8,0.4)]"
-                >
-                  🥇
-                </div>
-                <span
-                  class="text-[10px] font-black tracking-widest text-gray-500 uppercase"
-                  >Loyalty Status</span
-                >
-              </div>
-
-              <div>
-                <h3 class="text-2xl font-black">Elite Member</h3>
-                <p class="text-gray-400 text-xs font-medium mt-1">
-                  Dewa United Official Crew
-                </p>
-              </div>
-
-              <div class="pt-4 space-y-2">
-                <div
-                  class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-gray-400"
-                >
-                  <span>Performance</span>
-                  <span class="text-[var(--gold-main)]">Excellent</span>
-                </div>
-                <div
-                  class="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden"
-                >
-                  <div
-                    class="h-full bg-gradient-to-r from-[var(--gold-main)] to-amber-300 w-[90%] rounded-full shadow-[0_0_10px_rgba(234,179,8,0.5)]"
-                  ></div>
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="absolute -bottom-10 -right-6 text-white opacity-[0.03] select-none italic font-black text-[12rem] rotate-12"
-            >
-              DU
-            </div>
-          </div>
-
-          <div
-            class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100"
-          >
-            <h4
-              class="text-sm font-black text-gray-800 uppercase tracking-widest mb-6 flex items-center gap-2"
-            >
-              <span class="w-1.5 h-4 bg-[var(--gold-main)] rounded-full"></span>
-              Recent Activity
-            </h4>
-            <div class="space-y-6">
-              <div v-for="i in 3" :key="i" class="flex gap-4">
-                <div
-                  class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-sm border border-gray-100"
-                >
-                  {{ ["📝", "✅", "🕒"][i - 1] }}
-                </div>
-                <div>
-                  <p class="text-xs font-black text-gray-800 leading-none mb-1">
-                    {{
-                      ["Update Profile", "Overtime Approved", "Login Session"][
-                        i - 1
-                      ]
-                    }}
-                  </p>
-                  <p class="text-[10px] text-gray-400 font-medium">
-                    Today, 12:45 PM
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
