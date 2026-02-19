@@ -35,15 +35,16 @@ const menus = [
   {
     name: "Overtime Submission",
     icon: "⏰",
-<<<<<<< HEAD
     role: ["EMPLOYEE"],
-=======
-    role: ["PIC", "EMPLOYEE", "SUPERADMIN"],
->>>>>>> af28386aa649e63be85f386008c64c24107dade4
     children: [
       { name: "Overtime", to: "/overtime", icon: "📝" },
       { name: "View Overtime", to: "/overtime/view", icon: "📄" },
-      { name: "Overtime Logs", to: "/overtime/logs", icon: "📋", role: ["SUPERADMIN"] },
+      {
+        name: "Overtime Logs",
+        to: "/overtime/logs",
+        icon: "📋",
+        role: ["SUPERADMIN"],
+      },
     ],
   },
   {
@@ -83,19 +84,19 @@ const menus = [
 const filteredMenus = computed(() => {
   if (!userState.value) return [];
   const userRole = userState.value.role;
-  
+
   const filterByRole = (items: any[]) => {
     return items.filter((item) => {
       //superadmin liat semua
       if (userRole === "SUPERADMIN") return true;
-      
+
       const hasAccess = !item.role || item.role.includes(userRole);
-      
+
       if (hasAccess && item.children) {
         //filter child
         item.children = filterByRole(item.children);
       }
-      
+
       return hasAccess;
     });
   };
