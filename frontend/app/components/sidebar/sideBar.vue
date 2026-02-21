@@ -40,6 +40,12 @@ const menus = [
       { name: "Overtime", to: "/overtime", icon: "📝" },
       { name: "View Overtime", to: "/overtime/view", icon: "📄" },
       {
+        name: "Approval Overtime",
+        to: "/overtime/view/PicOvertime",
+        icon: "📋",
+        role: ["PIC"],
+      },
+      {
         name: "Overtime Logs",
         to: "/overtime/logs",
         icon: "📋",
@@ -47,20 +53,20 @@ const menus = [
       },
     ],
   },
-  {
-    name: "Approval PIC",
-    icon: "👨‍💼",
-    role: ["PIC"],
-    children: [
-      { name: "Overtime", to: "/overtime", icon: "📝" },
-      {
-        name: "Approval Overtime",
-        to: "/overtime/view/PicOvertime",
-        icon: "📝",
-      },
-      { name: "View Overtime", to: "/overtime/view", icon: "📄" },
-    ],
-  },
+  // {
+  //   name: "Approval PIC",
+  //   icon: "👨‍💼",
+  //   role: ["PIC"],
+  //   children: [
+  //     { name: "Overtime", to: "/overtime", icon: "📝" },
+  //     {
+  //       name: "Approval Overtime",
+  //       to: "/overtime/view/PicOvertime",
+  //       icon: "📝",
+  //     },
+  //     { name: "View Overtime", to: "/overtime/view", icon: "📄" },
+  //   ],
+  // },
   {
     name: "Approval Finance",
     icon: "💸",

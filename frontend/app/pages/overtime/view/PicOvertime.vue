@@ -4,11 +4,18 @@ import type { OvertimeSubmission } from "~/types/auth";
 import StatsCard from "~/components/ui/StatsCard.vue";
 import Stepper from "~/components/ui/Stepper.vue";
 import OvertimeTable from "~/components/ui/OvertimeTable.vue";
-import ProfileCard from "~/components/ui/ProfileCard.vue";
-import { formatCurrency } from "~/utils/helper";
+import { formatCurrency, formatDate, formatTime } from "~/utils/helper";
 
 const { userState } = useAuth();
-const { submissions, fetchSubmissions, loading, approveOvertime, rejectOvertime } = useOvertime();
+const {
+  submissions,
+  fetchSubmissions,
+  loading,
+  approveOvertime,
+  rejectOvertime,
+} = useOvertime();
+
+
 const activeTab = ref("PENDING_PIC");
 
 const handleApprove = async (id: string) => {
@@ -19,7 +26,6 @@ const handleApprove = async (id: string) => {
     alert("Overtime approved successfully");
   } catch (error) {
     console.error("Failed to approve overtime:", error);
-    alert("Failed to approve overtime");
   }
 };
 
@@ -36,60 +42,90 @@ const handleReject = async (id: string) => {
     alert("Overtime rejected");
   } catch (error) {
     console.error("Failed to reject overtime:", error);
-    alert("Failed to reject overtime");
   }
 };
 
-//filter tab
 const filteredData = computed(() => {
   if (!submissions.value) return [];
 
   return submissions.value.filter((item: OvertimeSubmission) => {
+    const role = userState.value?.role;
+    const isOwner = item.employee_id === userState.value?.id;
+
     if (activeTab.value === "PENDING_PIC") {
-      return (
-        item.status === "PENDING_PIC" &&
-        item.employee_id !== userState.value?.id
-      );
-    } else if (activeTab.value === "HISTORY_APPROVAL") {
-      return (
-        item.pic_id === userState.value?.id && item.status !== "PENDING_PIC"
-      );
-    } else {
-      return item.employee_id === userState.value?.id;
+      if (isOwner) return false;
+
+      if (role === "PIC") return item.status === "PENDING_PIC";
+      if (role === "C_LEVEL") return item.status === "PENDING_C_LEVEL";
+      if (role === "HRD") return item.status === "PENDING_HRD";
+      return false;
     }
+    return false;
   });
 });
 
 const totalProcess = computed(() => {
-  return submissions.value.filter(
-    (item: OvertimeSubmission) =>
-      item.status === "PENDING_PIC" && item.employee_id !== userState.value?.id,
-  ).length;
+  if (!submissions.value) return 0;
+  const role = userState.value?.role;
+
+  return submissions.value.filter((item: OvertimeSubmission) => {
+    if (item.employee_id === userState.value?.id) return false;
+    if (role === "PIC") return item.status === "PENDING_PIC";
+    if (role === "C_LEVEL") return item.status === "PENDING_C_LEVEL";
+    if (role === "HRD") return item.status === "PENDING_HRD";
+    return false;
+  }).length;
+});
+const pendingCount = computed(() => {
+  if (!submissions.value) return 0;
+
+  const role = userState.value?.role;
+  const allowedRoles = ["PIC", "C_LEVEL", "HRD"];
+
+  if (role && allowedRoles.includes(role)) {
+    return submissions.value.filter((s) => s.status.startsWith("PENDING"))
+      .length;
+  }
+  return 0;
 });
 
 const stats = computed(() => {
-  const totalGross = submissions.value.reduce(
-    (acc, curr) => acc + (curr.total_pay || 0),
-    0,
-  );
-  const pendingCount = submissions.value.filter((s) =>
-    s.status.startsWith("PENDING"),
-  ).length;
+  // const role = userState.value?.role;
+  const pendingCount = computed(() => {
+    if (!submissions.value) return 0;
 
+    const role = userState.value?.role;
+    const allowedRoles = ["PIC", "C_LEVEL", "HRD"];
+
+    if (role && allowedRoles.includes(role)) {
+      return submissions.value.filter((s) => s.status.startsWith("PENDING"))
+        .length;
+    }
+    return 0;
+  });
+
+  // submissions.value.filter((s) =>
+  //   s.status.startsWith("PENDING"),
+  // ).length;
   return [
     {
       label: "Total Data Terkait",
-      value: `${submissions.value.length} Data`,
+      value: `${pendingCount.value} Data`,
       icon: "🕒",
     },
-    { label: "Total Pending", value: `${pendingCount} Status`, icon: "📄" },
     {
-      label: "Total Lembur (Gross)",
-      value: formatCurrency(totalGross),
-      icon: "💰",
+      label: "Total Pending",
+      value: `${totalProcess.value} Status`,
+      icon: "📄",
     },
   ];
 });
+
+// console.log(
+//   "data Pending dan Process :",
+//   pendingCount.value,
+//   totalProcess.value,
+// );
 
 const getStepperStatus = (
   item: OvertimeSubmission,
@@ -105,8 +141,7 @@ const getStepperStatus = (
     return status === "PENDING_C_LEVEL" ? "process" : "done";
   }
   if (level === "HRD") {
-    if (status === "PENDING_HRD") return "process";
-    return "pending";
+    return status === "PENDING_HRD" ? "process" : "pending";
   }
   return "pending";
 };
@@ -120,29 +155,33 @@ onMounted(async () => {
   <div class="min-h-screen bg-[var(--white-bone)] p-8">
     <header class="flex justify-between items-center mb-10">
       <div>
-        <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">
+        <h1
+          class="text-3xl font-extrabold tracking-tight text-gray-900 uppercase"
+        >
           Dewa <span class="text-[var(--gold-main)]">Overtime</span>
         </h1>
-        <p class="text-gray-500 font-medium">
-          Panel PIC - Dewa United Indonesia
+        <p
+          class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-1"
+        >
+          Panel {{ userState?.role }} - Dewa United Indonesia
         </p>
       </div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
       <StatsCard v-for="stat in stats" :key="stat.label" v-bind="stat" />
     </div>
 
     <div
-      class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100"
+      class="bg-white rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-white"
     >
       <div
-        class="flex gap-8 justify-center items-center mt-8 border-b border-gray-50"
+        class="flex gap-10 justify-center items-center mt-10 border-b border-gray-50"
       >
         <button
           @click="activeTab = 'PENDING_PIC'"
           :class="[
-            'pb-4 px-2 text-sm font-bold transition-all relative flex items-center gap-2',
+            'pb-5 px-4 text-[11px] font-black uppercase tracking-widest transition-all relative flex items-center gap-3',
             activeTab === 'PENDING_PIC'
               ? 'text-amber-500'
               : 'text-gray-400 hover:text-gray-600',
@@ -151,44 +190,12 @@ onMounted(async () => {
           Overtime Request
           <span
             v-if="totalProcess > 0"
-            class="min-w-[20px] h-[20px] px-1.5 text-[10px] flex items-center justify-center rounded-full bg-amber-500 text-white shadow-sm border-2 border-white font-black"
+            class="w-5 h-5 text-[9px] flex items-center justify-center rounded-full bg-amber-500 text-white font-black"
           >
             {{ totalProcess }}
           </span>
           <div
             v-if="activeTab === 'PENDING_PIC'"
-            class="absolute bottom-0 left-0 w-full h-1 bg-amber-500 rounded-t-full"
-          ></div>
-        </button>
-
-        <button
-          @click="activeTab = 'PENDING_C_LEVEL'"
-          :class="[
-            'pb-4 text-sm font-bold transition-all relative',
-            activeTab === 'PENDING_C_LEVEL'
-              ? 'text-amber-500'
-              : 'text-gray-400 hover:text-gray-600',
-          ]"
-        >
-          Your Overtime
-          <div
-            v-if="activeTab === 'PENDING_C_LEVEL'"
-            class="absolute bottom-0 left-0 w-full h-1 bg-amber-500 rounded-t-full"
-          ></div>
-        </button>
-
-        <button
-          @click="activeTab = 'HISTORY_APPROVAL'"
-          :class="[
-            'pb-4 text-sm font-bold transition-all relative',
-            activeTab === 'HISTORY_APPROVAL'
-              ? 'text-amber-500'
-              : 'text-gray-400 hover:text-gray-600',
-          ]"
-        >
-          History Approval
-          <div
-            v-if="activeTab === 'HISTORY_APPROVAL'"
             class="absolute bottom-0 left-0 w-full h-1 bg-amber-500 rounded-t-full"
           ></div>
         </button>
@@ -198,9 +205,9 @@ onMounted(async () => {
         :headers="[
           'Tanggal',
           'Durasi',
-          'Nama',
-          'Progress',
-          'Estimasi',
+          'Nama Karyawan',
+          'Approval Progress',
+          'Estimasi Bayar',
           'Actions',
         ]"
       >
@@ -208,21 +215,30 @@ onMounted(async () => {
           <tr
             v-for="item in filteredData"
             :key="item.id"
-            class="hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
+            class="hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0"
           >
-            <td class="p-6 font-medium text-gray-700 whitespace-nowrap">
+            <td class="p-6 font-bold text-gray-800 whitespace-nowrap text-sm">
               {{ formatDate(item.date) }}
             </td>
-            <td class="p-6 text-gray-500 text-sm">
-              <span class="font-bold"
-                >{{ formatTime(item.start_time) }} -
+            <td class="p-6 text-gray-500 text-xs">
+              <span class="font-black text-gray-900 block">
+                {{ formatTime(item.start_time) }} -
                 {{ formatTime(item.end_time) }}
               </span>
-              : {{ Math.floor(item.duration_min / 60) }}j
+              {{ Math.floor(item.duration_min / 60) }}h
               {{ item.duration_min % 60 }}m
             </td>
-            <td class="p-6 text-gray-500 font-medium">
-              {{ item.employee?.name || "Unknown" }}
+            <td class="p-6">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold"
+                >
+                  {{ item.employee?.name?.charAt(0) }}
+                </div>
+                <span class="text-sm font-bold text-gray-700">{{
+                  item.employee?.name || "Unknown"
+                }}</span>
+              </div>
             </td>
             <td class="p-6">
               <Stepper
@@ -231,36 +247,30 @@ onMounted(async () => {
                 :hrd-status="getStepperStatus(item, 'HRD')"
               />
             </td>
-            <td class="p-6 text-right text-amber-500 font-black text-lg">
-              {{ formatCurrency(item.total_pay) }}
+            <td class="p-6 text-right">
+              <span class="text-amber-600 font-black text-base">{{
+                formatCurrency(item.total_pay)
+              }}</span>
             </td>
             <td class="p-6">
-              <div class="flex justify-center items-center gap-3">
+              <div class="flex justify-end items-center gap-2">
                 <NuxtLink
                   :to="`/overtime/view/${item.id}`"
-                  class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
-                  ><button class="hover:scale-125 transition-all">
-                    🔍
-                  </button></NuxtLink
+                  class="p-2.5 bg-gray-50 text-gray-400 hover:text-black hover:bg-white hover:shadow-md rounded-xl transition-all"
                 >
+                  🔍
+                </NuxtLink>
 
-                <template
-                  v-if="
-                    activeTab === 'PENDING_PIC' &&
-                    item.employee?.id !== userState?.id
-                  "
-                >
+                <template v-if="activeTab === 'PENDING_PIC'">
                   <button
-                    title="Approve"
-                    class="cursor-pointer hover:bg-green-50 rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-green-400 bg-white"
                     @click="handleApprove(item.id)"
+                    class="p-2.5 bg-white shadow-sm border border-gray-100 hover:border-green-500 text-green-500 rounded-xl transition-all hover:shadow-lg hover:shadow-green-100"
                   >
                     ✅
                   </button>
                   <button
-                    title="Reject"
-                    class="cursor-pointer hover:bg-red-50 rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-red-400 bg-white"
                     @click="handleReject(item.id)"
+                    class="p-2.5 bg-white shadow-sm border border-gray-100 hover:border-red-500 text-red-500 rounded-xl transition-all hover:shadow-lg hover:shadow-red-100"
                   >
                     ❌
                   </button>
@@ -270,15 +280,15 @@ onMounted(async () => {
           </tr>
 
           <tr v-if="filteredData.length === 0">
-            <td
-              colspan="6"
-              class="p-12 text-center text-gray-400 text-sm italic"
-            >
-              Belum ada data
-              {{
-                activeTab === "process" ? "pengajuan masuk" : "lembur pribadi"
-              }}
-              untuk saat ini.
+            <td colspan="6" class="p-20 text-center">
+              <div class="flex flex-col items-center">
+                <span class="text-4xl mb-4 opacity-20">📂</span>
+                <p
+                  class="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]"
+                >
+                  No submissions found in this category
+                </p>
+              </div>
             </td>
           </tr>
         </template>

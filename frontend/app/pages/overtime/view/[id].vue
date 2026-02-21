@@ -7,7 +7,9 @@ import StatsCard from "~/components/ui/StatsCard.vue";
 
 const { userState } = useAuth();
 const route = useRoute();
-const { getOvertimeById, loading, approveOvertime, rejectOvertime } = useOvertime();
+const { getOvertimeById, loading, approveOvertime, rejectOvertime } =
+  useOvertime();
+
 const submission = ref<OvertimeSubmission | null>(null);
 
 const canApprove = computed(() => {
@@ -82,9 +84,32 @@ const getStepperStatus = (
   }
   return "pending";
 };
+//get user by id buat pic sama clevel
+// const { fetchUserById } = useUser();
+// const picName = ref("Loading...");
+// const clevelName = ref("Loading...");
+
+// const loadApproverNames = async () => {
+//   if (!submission.value) return;
+
+//   const picData = (await fetchUserById(submission.value.pic_id)) as any;
+//   const clevelData = (await fetchUserById(submission.value.clevel_id)) as any;
+
+//   picName.value = picData?.name || "Not Assigned";
+//   clevelName.value = clevelData?.name || "Not Assigned";
+// };
+
+// watch(
+//   () => submission.value,
+//   (newVal) => {
+//     if (newVal) loadApproverNames();
+//   },
+//   { immediate: true },
+// );
 
 onMounted(fetchDetail);
 
+console.log("submission data : ", submission);
 const stats = computed(() => {
   if (!submission.value) return [];
   return [
@@ -109,21 +134,45 @@ const stats = computed(() => {
 
 <template>
   <div class="min-h-screen bg-[var(--white-bone)] p-8">
-    <header class="flex justify-between items-center mb-10">
-      <div class="flex items-center gap-4">
+    <header
+      class="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-12"
+    >
+      <div class="flex items-center gap-5">
         <NuxtLink
           to="/overtime/view"
-          class="p-2 hover:bg-gray-100 text-black rounded-full transition-all"
+          class="group flex items-center justify-center w-12 h-12 bg-white border border-gray-200 text-gray-600 rounded-2xl shadow-sm hover:shadow-md hover:border-[var(--gold-main)] hover:text-[var(--gold-main)] transition-all duration-300"
+          title="Kembali"
         >
-          < Back
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2.5"
+            stroke="currentColor"
+            class="w-5 h-5 group-hover:-translate-x-1 transition-transform"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.75 19.5L8.25 12l7.5-7.5"
+            />
+          </svg>
         </NuxtLink>
+
         <div>
-          <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">
+          <h1
+            class="text-3xl md:text-4xl font-black tracking-tight text-gray-900 leading-tight"
+          >
             Overtime <span class="text-[var(--gold-main)]">Detail</span>
           </h1>
-          <p class="text-gray-500 font-medium">
-            Review your submission details
-          </p>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="w-8 h-[2px] bg-[var(--gold-main)] rounded-full"></span>
+            <p
+              class="text-sm font-bold text-gray-400 uppercase tracking-widest"
+            >
+              Review Submission Details
+            </p>
+          </div>
         </div>
       </div>
     </header>
@@ -166,28 +215,67 @@ const stats = computed(() => {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div class="space-y-6">
             <div>
-              <label class="text-xs font-black uppercase tracking-wider text-gray-400">Employee</label>
-              <p class="text-lg font-bold text-gray-800">{{ submission.employee?.name }}</p>
-              <p class="text-gray-500">{{ submission.employee?.department?.name }}</p>
-            </div>
-            <div>
-              <label class="text-xs font-black uppercase tracking-wider text-gray-400">Date & Time</label>
-              <p class="text-lg font-bold text-gray-800">{{ formatDate(submission.date) }}</p>
+              <label
+                class="text-xs font-black uppercase tracking-wider text-gray-400"
+                >Employee</label
+              >
+              <p class="text-lg font-bold text-gray-800">
+                {{ submission.employee?.name }}
+              </p>
               <p class="text-gray-500">
-                {{ formatTime(submission.start_time) }} - {{ formatTime(submission.end_time) }}
+                {{ submission.employee?.department?.name }}
               </p>
             </div>
             <div>
-              <label class="text-xs font-black uppercase tracking-wider text-gray-400">Reason</label>
+              <label
+                class="text-xs font-black uppercase tracking-wider text-gray-400"
+                >Date & Time</label
+              >
+              <p class="text-lg font-bold text-gray-800">
+                {{ formatDate(submission.date) }}
+              </p>
+              <p class="text-gray-500">
+                {{ formatTime(submission.start_time) }} -
+                {{ formatTime(submission.end_time) }}
+              </p>
+            </div>
+            <div>
+              <label
+                class="text-xs font-black uppercase tracking-wider text-gray-400"
+                >Reason</label
+              >
               <p class="text-gray-700 mt-2 bg-gray-50 p-4 rounded-xl italic">
                 "{{ submission.reason }}"
               </p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  class="text-xs font-black uppercase tracking-wider text-gray-400"
+                  >PIC Overtime</label
+                >
+                <p class="text-lg font-bold text-gray-800">
+                  {{ submission.pic?.name }}
+                </p>
+              </div>
+              <div>
+                <label
+                  class="text-xs font-black uppercase tracking-wider text-gray-400"
+                  >C Level</label
+                >
+                <p class="text-lg font-bold text-gray-800">
+                  {{ submission.clevel?.name }}
+                </p>
+              </div>
             </div>
           </div>
 
           <div class="space-y-8">
             <div>
-              <label class="text-xs font-black uppercase tracking-wider text-gray-400 mb-4 block">Progress</label>
+              <label
+                class="text-xs font-black uppercase tracking-wider text-gray-400 mb-4 block"
+                >Progress</label
+              >
               <Stepper
                 :pic-status="getStepperStatus(submission, 'PIC')"
                 :clevel-status="getStepperStatus(submission, 'CLEVEL')"
@@ -195,9 +283,17 @@ const stats = computed(() => {
               />
             </div>
 
-            <div v-if="submission.rejection_reason" class="p-4 bg-red-50 border border-red-100 rounded-2xl">
-              <label class="text-xs font-black uppercase text-red-400 mb-1 block">Rejection Reason</label>
-              <p class="text-red-700 font-medium">{{ submission.rejection_reason }}</p>
+            <div
+              v-if="submission.rejection_reason"
+              class="p-4 bg-red-50 border border-red-100 rounded-2xl"
+            >
+              <label
+                class="text-xs font-black uppercase text-red-400 mb-1 block"
+                >Rejection Reason</label
+              >
+              <p class="text-red-700 font-medium">
+                {{ submission.rejection_reason }}
+              </p>
             </div>
           </div>
         </div>
@@ -224,7 +320,10 @@ const stats = computed(() => {
 
     <div v-else class="text-center py-20">
       <p class="text-gray-400 italic">Submission not found.</p>
-      <NuxtLink to="/overtime/view" class="text-[var(--gold-main)] font-bold mt-4 inline-block hover:underline">
+      <NuxtLink
+        to="/overtime/view"
+        class="text-[var(--gold-main)] font-bold mt-4 inline-block hover:underline"
+      >
         Back to list
       </NuxtLink>
     </div>

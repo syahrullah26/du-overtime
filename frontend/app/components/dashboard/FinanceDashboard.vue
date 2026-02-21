@@ -161,7 +161,9 @@ const getStepperStatus = (
             :key="item.id"
             class="hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
           >
-            <td class="p-6 font-medium text-gray-700">{{ item.date }}</td>
+            <td class="p-6 font-medium text-gray-700">
+              {{ formatDate(item.date) }}
+            </td>
             <td class="p-6">
               <div class="flex flex-col">
                 <span class="text-gray-800 font-bold">{{
@@ -174,7 +176,11 @@ const getStepperStatus = (
               </div>
             </td>
             <td class="p-6 text-gray-500 text-sm">
-              {{ Math.floor(item.duration_min / 60) }}j
+              <span class="font-bold"
+                >{{ formatTime(item.start_time) }} -
+                {{ formatTime(item.end_time) }}
+              </span>
+              : {{ Math.floor(item.duration_min / 60) }}j
               {{ item.duration_min % 60 }}m
             </td>
             <td class="p-6">

@@ -132,9 +132,15 @@ const getStepperStatus = (
             :key="item.id"
             class="hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
           >
-            <td class="p-6 font-medium text-gray-700">{{ item.date }}</td>
+            <td class="p-6 font-medium text-gray-700">
+              {{ formatDate(item.date) }}
+            </td>
             <td class="p-6 text-gray-500 text-sm">
-              {{ Math.floor(item.duration_min / 60) }}j
+              <span class="font-bold"
+                >{{ formatTime(item.start_time) }} -
+                {{ formatTime(item.end_time) }}
+              </span>
+              : {{ Math.floor(item.duration_min / 60) }}j
               {{ item.duration_min % 60 }}m
             </td>
             <td class="p-6">
@@ -162,13 +168,12 @@ const getStepperStatus = (
             </td>
             <td class="p-6">
               <div class="flex justify-center items-center gap-3">
-                <button
-                  title="Lihat Detail"
-                  class="p-2 hover:bg-gray-100 rounded-lg transition-all"
+                <NuxtLink
+                  :to="`/overtime/view/${item.id}`"
+                  class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
                 >
-                  🔍
-                </button>
-
+                  <button class="hover:scale-125 transition-all">🔍</button>
+                </NuxtLink>
                 <template v-if="item.status === 'PENDING_C_LEVEL'">
                   <button
                     title="Approve"

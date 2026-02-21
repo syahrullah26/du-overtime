@@ -65,13 +65,26 @@ const totalProcess = computed(() => {
 });
 
 const stats = computed(() => {
+  const role = props.user?.role;
+  const myId = props.user?.id;
+
   const totalGross = props.submissions.reduce(
     (acc, curr) => acc + (curr.total_pay || 0),
     0,
   );
-  const pendingCount = props.submissions.filter((s) =>
-    s.status.startsWith("PENDING"),
-  ).length;
+  const pendingCount = props.submissions.filter((item) => {
+    if (item.employee_id === myId) return false;
+
+    if (role === "PIC") {
+      return item.status === "PENDING_PIC";
+    } else if (role === "C_LEVEL") {
+      return item.status === "PENDING_C_LEVEL";
+    } else if (role === "HRD") {
+      return item.status === "PENDING_HRD";
+    }
+
+    return false;
+  }).length;
 
   return [
     {
@@ -79,7 +92,11 @@ const stats = computed(() => {
       value: `${props.submissions.length} Data`,
       icon: "🕒",
     },
-    { label: "Total Pending", value: `${pendingCount} Status`, icon: "📄" },
+    {
+      label: "Perlu Diproses",
+      value: `${pendingCount} Request`,
+      icon: "📄",
+    },
     {
       label: "Total Lembur (Gross)",
       value: formatCurrency(totalGross),

@@ -12,6 +12,18 @@ const props = defineProps<{
   loading: boolean;
 }>();
 
+// const { fetchUserById } = useUser();
+// const userId = computed(() => props.user.id);
+
+// const getUserDept = async () => {
+//   const userDept = (await fetchUserById(userId.value)) as any;
+//   if (userDept) {
+//     return userDept.departement?.name;
+//   }
+//   return "gagal fetch";
+// };
+
+// console.log("departement : ", getUserDept());
 // const stats = computed(() => {
 //   const totalGross = props.submissions.reduce(
 //     (acc, curr) => acc + (curr.total_pay || 0),
@@ -35,6 +47,8 @@ const props = defineProps<{
 //     },
 //   ];
 // });
+
+console.log("props.user", props.user);
 
 const getStepperStatus = (
   item: OvertimeSubmission,

@@ -46,7 +46,9 @@ export interface OvertimeSubmission {
   status: OvertimeStatus;
   reason: string;
   pic_id: string;
+  pic?: User;
   clevel_id: string;
+  clevel?: User;
   signature_pic: string | null;
   signature_clevel: string | null;
   signature_hrd: string | null;
@@ -92,5 +94,3 @@ export interface GlobalSetting {
   created_at: string;
   updated_at: string;
 }
-
-
