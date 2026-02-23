@@ -33,6 +33,8 @@ watch(
   { immediate: true },
 );
 
+const handleAvatarChange = (event: any) => {};
+
 // update profile
 const updateProfile = async () => {
   loadingForm.value = true;
@@ -146,12 +148,12 @@ watch(userId, loadData);
                       class="text-[10px] text-white font-black uppercase tracking-widest"
                       >Update Photo</span
                     >
-                    <!-- <input
+                    <input
                       type="file"
                       class="hidden"
                       accept="image/*"
                       @change="handleAvatarChange"
-                    /> -->
+                    />
                   </label>
                 </div>
               </div>
