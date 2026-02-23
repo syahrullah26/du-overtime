@@ -238,7 +238,7 @@ const isActive = (path: string) =>
             <div class="grid grid-cols-2 gap-2">
               <img
                 :src="
-                  userState?.avatar ||
+                  getImageUrl(userState?.profile_picture) ||
                   'https://ui-avatars.com/api/?name=' + userState.name
                 "
                 class="rounded-full w-10 mx-auto my-2 object-cover aspect-square"

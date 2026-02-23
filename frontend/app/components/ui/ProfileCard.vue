@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { getImageUrl } from "~/utils/helper";
 const props = defineProps<{
   name: string;
+  email: string;
   role: string;
   department: {
     name: string;
   };
-  avatar?: string;
+  profile_picture?: string;
 }>();
 
 // switch (props.role) {
@@ -22,7 +24,10 @@ const props = defineProps<{
     >
       <div class="flex justify-center items-center">
         <img
-          :src="avatar || 'https://ui-avatars.com/api/?name=' + name"
+          :src="
+            getImageUrl(props.profile_picture) ||
+            'https://ui-avatars.com/api/?name=' + name
+          "
           class="rounded-full w-32 mx-auto mb-4 object-cover aspect-square"
         />
       </div>
@@ -32,6 +37,7 @@ const props = defineProps<{
         </h2>
         <div class="flex items-center justify-center gap-4">
           <div class="flex-1 h-px bg-[#7b5902]"></div>
+
           <p class="text-gray-400 text-xs uppercase font-bold tracking-widest">
             {{ department?.name || role }}
           </p>

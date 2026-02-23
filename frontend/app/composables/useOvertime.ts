@@ -6,8 +6,8 @@ interface OvertimePayload {
   start_time: string;
   end_time: string;
   reason: string;
-  pic_id: string;
-  clevel_id: string;
+  pic_id: number;
+  clevel_id: number;
 }
 
 export const useOvertime = () => {

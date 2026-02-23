@@ -248,24 +248,98 @@ const stats = computed(() => {
                 "{{ submission.reason }}"
               </p>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
+            <div class="grid grid-cols-2 gap-8 border-t border-gray-100 pt-6">
+              <div class="flex flex-col space-y-2">
                 <label
-                  class="text-xs font-black uppercase tracking-wider text-gray-400"
-                  >PIC Overtime</label
+                  class="text-[10px] font-black uppercase tracking-widest text-gray-400"
                 >
-                <p class="text-lg font-bold text-gray-800">
-                  {{ submission.pic?.name }}
+                  PIC Overtime
+                </label>
+                <p class="text-base font-bold text-gray-800 leading-tight">
+                  {{ submission.pic?.name || "Unassigned" }}
                 </p>
+
+                <div class="h-16 flex items-center">
+                  <div
+                    v-if="submission.status === 'PENDING_PIC'"
+                    class="flex items-center gap-2"
+                  >
+                    <div
+                      class="w-2 h-2 bg-red-500 rounded-full animate-pulse"
+                    ></div>
+                    <p
+                      class="text-xs font-bold text-red-500 uppercase tracking-tighter"
+                    >
+                      Waiting for Approval
+                    </p>
+                  </div>
+
+                  <template v-else>
+                    <img
+                      :src="
+                        getImageUrl(submission.pic?.signature) ||
+                        'https://cdn-icons-png.flaticon.com/512/190/190411.png'
+                      "
+                      :class="[
+                        submission.pic?.signature
+                          ? 'w-24 object-contain'
+                          : 'w-8 h-8 object-contain',
+                        'transition-all duration-500',
+                      ]"
+                      alt="PIC Signature"
+                    />
+                  </template>
+                </div>
               </div>
-              <div>
+
+              <div class="flex flex-col space-y-2 border-l border-gray-50 pl-8">
                 <label
-                  class="text-xs font-black uppercase tracking-wider text-gray-400"
-                  >C Level</label
+                  class="text-[10px] font-black uppercase tracking-widest text-gray-400"
                 >
-                <p class="text-lg font-bold text-gray-800">
-                  {{ submission.clevel?.name }}
+                  C Level
+                </label>
+                <p class="text-base font-bold text-gray-800 leading-tight">
+                  {{ submission.clevel?.name || "Unassigned" }}
                 </p>
+
+                <div class="h-16 flex items-center">
+                  <div
+                    v-if="submission.status === 'PENDING_PIC'"
+                    class="text-xs text-gray-300 italic"
+                  >
+                    Menunggu PIC...
+                  </div>
+
+                  <div
+                    v-else-if="submission.status === 'PENDING_C_LEVEL'"
+                    class="flex items-center gap-2"
+                  >
+                    <div
+                      class="w-2 h-2 bg-red-500 rounded-full animate-pulse"
+                    ></div>
+                    <p
+                      class="text-xs font-bold text-red-500 uppercase tracking-tighter"
+                    >
+                      Pending Review
+                    </p>
+                  </div>
+
+                  <template v-else>
+                    <img
+                      :src="
+                        getImageUrl(submission.clevel?.signature) ||
+                        'https://cdn-icons-png.flaticon.com/512/190/190411.png'
+                      "
+                      :class="[
+                        submission.clevel?.signature
+                          ? 'w-24 object-contain'
+                          : 'w-8 h-8 object-contain',
+                        'transition-all duration-500',
+                      ]"
+                      alt="C-Level Signature"
+                    />
+                  </template>
+                </div>
               </div>
             </div>
           </div>

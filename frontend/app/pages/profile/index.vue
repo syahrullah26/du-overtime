@@ -33,11 +33,6 @@ const handleLogout = async () => {
   }
 };
 
-const getImageUrl = (path: string | null | undefined) => {
-  if (!path) return null;
-  if (path.startsWith("http")) return path;
-  return `http://localhost:8000/storage/${path}`;
-};
 </script>
 
 <template>
@@ -139,6 +134,7 @@ const getImageUrl = (path: string | null | undefined) => {
                 </div>
 
                 <div
+                  v-if="profileCompletion < 100"
                   class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-3 py-1.5 rounded-xl font-black tracking-widest uppercase shadow-xl"
                 >
                   {{ profileCompletion }}% Complete

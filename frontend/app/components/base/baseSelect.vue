@@ -66,7 +66,6 @@ const emit = defineEmits(["update:modelValue"]);
         >
           {{ opt.label }}
         </option>
-        <option value="other">Lainnya</option>
       </select>
 
       <div

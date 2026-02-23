@@ -50,22 +50,10 @@ export const formatTime = (date: string | Date | number): string => {
   }
 };
 
-export const getAvatarUrl = (path: string | null | undefined) => {
-  if (!path) return "/images/default-avatar.png";
-  if (path.startsWith("http")) return path;
-
-  const baseUrl = "http://localhost:8000/storage/";
-
-  return `${baseUrl}/storage/${path}`;
-};
-
-export const getSignatureUrl = (path: string | null | undefined) => {
+export const getImageUrl = (path: string | null | undefined) => {
   if (!path) return null;
-
   if (path.startsWith("http")) return path;
-  const baseUrl = "http://localhost:8000/storage/";
-
-  return `${baseUrl}/storage/${path}`;
+  return `http://localhost:8000/storage/${path}`;
 };
 
 /**

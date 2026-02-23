@@ -6,6 +6,20 @@ import type {
 export const useUser = () => {
   const userSelected = ref<any>(null);
   const loading = ref(false);
+
+  const fetchAllUsers = async () => {
+    try {
+      loading.value = true;
+      const response = await useApiFetch<any>(`/users`);
+      return response.data || response;
+    } catch (error: any) {
+      console.error(
+        "Error Fetching All Users Data:",
+        error.data | error.message,
+      );
+    }
+    return [];
+  };
   const fetchUserById = async (id: string) => {
     try {
       loading.value = true;
@@ -70,7 +84,10 @@ export const useUser = () => {
       });
       return response.data || response;
     } catch (error: any) {
-      console.error("Error uploading profile picture:", error.data || error.message);
+      console.error(
+        "Error uploading profile picture:",
+        error.data || error.message,
+      );
       throw error;
     } finally {
       loading.value = false;
@@ -113,6 +130,7 @@ export const useUser = () => {
   };
 
   return {
+    fetchAllUsers,
     fetchUserById,
     fetchUsersByRole,
     updatePassword,

@@ -15,9 +15,8 @@ const props = defineProps<{
 const emit = defineEmits(["submit", "cancel"]);
 
 const { userState } = useAuth();
-const { fetchUsersByRole } = useUser();
+const { fetchUsersByRole, fetchAllUsers } = useUser();
 const { submitOvertime, updateOvertime } = useOvertime();
-
 
 const isLoading = ref(false);
 const errorMessage = ref("");
@@ -37,26 +36,55 @@ const form = ref({
   startTime: "",
   endTime: "",
   reason: "",
-  pic: "",
-  clevel: "",
+  pic: "" as string | number,
+  clevel: "" as string | number,
+  otherPicId: "" as string | number,
+  otherClevelId: "" as string | number,
 });
 
 //Fetch data pic dan clevel
-const { pending } = useAsyncData(
-  "load-roles",
-  async () => {
-    const [pics, clevels] = await Promise.all([
-      fetchUsersByRole("PIC") || Promise.resolve([]),
-      fetchUsersByRole("C_LEVEL") || Promise.resolve([]),
-    ]);
-    picOptions.value = pics || [];
-    clevelOptions.value = clevels || [];
+// Tambahkan state untuk kontrol UI
+const isOtherPic = ref(false);
+const isOtherClevel = ref(false);
+
+// State untuk menyimpan daftar semua user untuk pencarian manual
+const allUsers = ref<SelectOption[]>([]);
+
+// Fetch user data dan select option manual
+const fetchRoles = async () => {
+  try {
+    const response = await fetchAllUsers();
+
+    const allDataRaw = response?.users || response || [];
+
+    const pics = allDataRaw.filter((u: any) => u.role === "PIC");
+    const clevels = allDataRaw.filter(
+      (u: any) => u.role === "CLEVEL" || u.role === "C_LEVEL",
+    );
+
+    const otherOption = {
+      label: "--- LAINNYA (Pilih Manual) ---",
+      value: "OTHER",
+    };
+
+    const mapToOption = (users: any[]) =>
+      users.map((u) => ({ label: u.name, value: u.id }));
+
+    picOptions.value = [...mapToOption(pics), otherOption];
+    clevelOptions.value = [...mapToOption(clevels), otherOption];
+
+    allUsers.value = mapToOption(allDataRaw);
+
     return true;
-  },
-  {
-    server: false,
-  },
-);
+  } catch (err) {
+    console.error("Error loading roles:", err);
+    return false;
+  }
+};
+const { pending } = await useAsyncData("load-roles", () => fetchRoles(), {
+  server: false,
+  lazy: true,
+});
 
 //initial data di edit mode
 onMounted(() => {
@@ -65,26 +93,34 @@ onMounted(() => {
     form.value = {
       name: data.employee?.name || userState.value?.name || "",
       position: data.employee?.role || userState.value?.role || "",
-      date: (data.date?.split("T")[0] || ""),
-      startTime: (data.start_time?.split(" ")?.[1]?.substring(0, 5) || ""),
-      endTime: (data.end_time?.split(" ")?.[1]?.substring(0, 5) || ""),
+      date: data.date?.split("T")[0] || "",
+      startTime: data.start_time?.split(" ")?.[1]?.substring(0, 5) || "",
+      endTime: data.end_time?.split(" ")?.[1]?.substring(0, 5) || "",
       reason: data.reason || "",
-      pic: data.pic_id || "",
-      clevel: data.clevel_id || "",
+      pic: data.pic_id ? Number(data.pic_id) : "",
+      clevel: data.clevel_id ? Number(data.clevel_id) : "",
+      otherPicId: "",
+      otherClevelId: "",
     };
   }
 });
 
 const handleSubmit = async () => {
   errorMessage.value = "";
+  const finalPicId =
+    form.value.pic === "OTHER" ? form.value.otherPicId : form.value.pic;
+  const finalClevelId =
+    form.value.clevel === "OTHER"
+      ? form.value.otherClevelId
+      : form.value.clevel;
   //validasi form
   if (
     !form.value.date ||
     !form.value.startTime ||
     !form.value.endTime ||
     !form.value.reason ||
-    !form.value.clevel ||
-    !form.value.pic
+    !finalPicId ||
+    !finalClevelId
   ) {
     errorMessage.value = "Please fill in all fields";
     return;
@@ -99,8 +135,8 @@ const handleSubmit = async () => {
       start_time: `${form.value.date} ${form.value.startTime}:00`,
       end_time: `${form.value.date} ${form.value.endTime}:00`,
       reason: form.value.reason,
-      pic_id: form.value.pic,
-      clevel_id: form.value.clevel,
+      pic_id: Number(finalPicId),
+      clevel_id: Number(finalClevelId),
     };
 
     let result;
@@ -113,9 +149,11 @@ const handleSubmit = async () => {
     if (result) {
       emit("submit", result);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Submit error:", error);
-    errorMessage.value = "Failed to submit overtime. Please check your data.";
+    errorMessage.value =
+      error.response?._data?.message ||
+      "Failed to submit overtime. Please check your data.";
   } finally {
     isLoading.value = false;
   }
@@ -198,20 +236,43 @@ const handleSubmit = async () => {
         />
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mx-4 my-4">
-        <BaseSelect
-          v-model="form.pic"
-          label="Pilih PIC"
-          placeholder="Pilih PIC Overtime"
-          :options="picOptions"
-          required
-        />
-        <BaseSelect
-          v-model="form.clevel"
-          label="Pilih C-Level"
-          placeholder="Pilih C-Level Overtime"
-          :options="clevelOptions"
-          required
-        />
+        <div class="flex flex-col gap-2">
+          <BaseSelect
+            v-model="form.pic"
+            label="Pilih PIC"
+            placeholder="Pilih PIC Overtime"
+            :options="picOptions"
+            required
+          />
+          <BaseSelect
+            v-if="form.pic === 'OTHER'"
+            v-model="form.otherPicId"
+            label="Cari PIC Pengganti"
+            placeholder="Ketik nama user..."
+            :options="allUsers"
+            required
+            class="mt-2 border-l-4 border-[var(--gold-main)] pl-2"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <BaseSelect
+            v-model="form.clevel"
+            label="Pilih C-Level"
+            placeholder="Pilih C-Level Overtime"
+            :options="clevelOptions"
+            required
+          />
+          <BaseSelect
+            v-if="form.clevel === 'OTHER'"
+            v-model="form.otherClevelId"
+            label="Cari C-Level Pengganti"
+            placeholder="Ketik nama C-Level..."
+            :options="allUsers"
+            required
+            class="mt-2 border-l-4 border-[var(--gold-main)] pl-2"
+          />
+        </div>
       </div>
       <div class="flex justify-center items-center gap-2 my-4">
         <BaseButton
