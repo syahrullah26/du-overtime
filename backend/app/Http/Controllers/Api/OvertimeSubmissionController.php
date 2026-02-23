@@ -74,22 +74,22 @@ class OvertimeSubmissionController extends Controller
             'start_time' => 'required|date_format:Y-m-d H:i:s',
             'end_time' => 'required|date_format:Y-m-d H:i:s|after:start_time',
             'reason' => 'required|string',
-            'pic_id' => 'required|uuid|exists:users,id',
-            'clevel_id' => 'required|uuid|exists:users,id',
+            'pic_id' => 'required|integer|exists:users,id',
+            'clevel_id' => 'required|integer|exists:users,id',
         ]);
 
         $submission = new OvertimeSubmission($validated);
         $submission->employee_id = $request->user()->id;
         $submission->status = OvertimeSubmission::STATUS_PENDING_PIC;
-        
+
         // kalkulasi durasi
         $submission->calculateDuration();
-        
+
         // set rateny
         $flatRate = GlobalSetting::getValue('FLAT_RATE_PER_HOUR', 50000);
         $submission->applied_rate = $flatRate;
         $submission->total_pay = round(($submission->duration_min / 60) * $flatRate, 2);
-        
+
         $submission->save();
 
         // masukin ke log
@@ -116,6 +116,8 @@ class OvertimeSubmissionController extends Controller
     {
         $submission = OvertimeSubmission::with([
             'employee.department',
+            'pic',
+            'clevel',
             'logs.actionByUser'
         ])->findOrFail($id);
 
@@ -154,12 +156,12 @@ class OvertimeSubmissionController extends Controller
             'start_time' => 'sometimes|date_format:Y-m-d H:i:s',
             'end_time' => 'sometimes|date_format:Y-m-d H:i:s|after:start_time',
             'reason' => 'sometimes|string',
-            'pic_id' => 'sometimes|uuid|exists:users,id',
-            'clevel_id' => 'sometimes|uuid|exists:users,id',
+            'pic_id' => 'sometimes|integer|exists:users,id',
+            'clevel_id' => 'sometimes|integer|exists:users,id',
         ]);
 
         $submission->update($validated);
-        
+
         // kalkulasi ulg kalo waktu brubah
         if (isset($validated['start_time']) || isset($validated['end_time'])) {
             $submission->calculateDuration();
