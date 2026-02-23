@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -46,10 +47,10 @@ class UserController extends Controller
     /**
      * Display the specified user.
      *
-     * @param string $id
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(string $id)
+    public function show(int $id)
     {
         $user = User::with(['department', 'overtimeSubmissions'])->findOrFail($id);
 
@@ -62,10 +63,10 @@ class UserController extends Controller
      * Update user tertentu.
      *
      * @param Request $request
-     * @param string $id
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $id)
     {
         $user = User::findOrFail($id);
 
@@ -79,7 +80,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,' . $id,
-            'dept_id' => 'nullable|uuid|exists:departments,id',
+            'dept_id' => 'nullable|integer|exists:departments,id',
         ]);
 
         // cm hrd/superadmin yg bs apdet role
@@ -99,13 +100,89 @@ class UserController extends Controller
     }
 
     /**
+     * Upload profile picture.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadProfilePicture(Request $request, int $id)
+    {
+        $user = User::findOrFail($id);
+
+        // user cm bs upload foto dia sendiri, ditambah hrd dan superadmin
+        if ($request->user()->id !== $id && !in_array($request->user()->role, ['HRD', 'SUPERADMIN'])) {
+            return response()->json([
+                'message' => 'Unauthorized to update this user',
+            ], 403);
+        }
+
+        $request->validate([
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10048',
+        ]);
+
+        // Hapus foto lama kalo ada
+        if ($user->profile_picture) {
+            Storage::disk('public')->delete($user->profile_picture);
+        }
+
+        $path = $request->file('profile_picture')->store('profile-pictures', 'public');
+
+        $user->update(['profile_picture' => $path]);
+
+        return response()->json([
+            'message' => 'Profile picture uploaded successfully',
+            'data' => $user->fresh()->load('department'),
+            'profile_picture_url' => asset('storage/' . $path),
+        ]);
+    }
+
+    /**
+     * Upload signature (tanda tangan).
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadSignature(Request $request, int $id)
+    {
+        $user = User::findOrFail($id);
+
+        // user cm bs upload tanda tangan dia sendiri, ditambah hrd dan superadmin
+        if ($request->user()->id !== $id && !in_array($request->user()->role, ['HRD', 'SUPERADMIN'])) {
+            return response()->json([
+                'message' => 'Unauthorized to update this user',
+            ], 403);
+        }
+
+        $request->validate([
+            'signature' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        // Hapus tanda tangan lama kalo ada
+        if ($user->signature) {
+            Storage::disk('public')->delete($user->signature);
+        }
+
+        $path = $request->file('signature')->store('signatures', 'public');
+
+        $user->update(['signature' => $path]);
+
+        return response()->json([
+            'message' => 'Signature uploaded successfully',
+            'data' => $user->fresh()->load('department'),
+            'signature_url' => asset('storage/' . $path),
+        ]);
+    }
+
+    /**
      * apdet user pw.
      *
      * @param Request $request
-     * @param string $id
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updatePassword(Request $request, string $id)
+    public function updatePassword(Request $request, int $id)
     {
         $user = User::findOrFail($id);
 
@@ -141,10 +218,10 @@ class UserController extends Controller
      * Remove the specified user.
      *
      * @param Request $request
-     * @param string $id
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, string $id)
+    public function destroy(Request $request, int $id)
     {
         // cm hrd/superadmin yg bs dlt user
         if (!in_array($request->user()->role, ['HRD', 'SUPERADMIN'])) {

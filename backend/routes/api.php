@@ -38,6 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/{id}', [UserController::class, 'show']);
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::put('/users/{id}/password', [UserController::class, 'updatePassword']);
+    Route::post('/users/{id}/profile-picture', [UserController::class, 'uploadProfilePicture']);
+    Route::post('/users/{id}/signature', [UserController::class, 'uploadSignature']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
     // Global Settings

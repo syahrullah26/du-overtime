@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('overtime_submissions', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('employee_id');
+            $table->id();
+            $table->unsignedBigInteger('employee_id');
             $table->date('date');
             $table->dateTime('start_time');
             $table->dateTime('end_time');

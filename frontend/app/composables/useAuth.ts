@@ -91,6 +91,18 @@ export const useAuth = () => {
     return null;
   };
 
+  const fetchUser = async () => {
+    try {
+      const response = await useApiFetch<{ user: User }>("/user");
+      if (response.user) {
+        userCookie.value = response.user;
+      }
+      return response.user;
+    } catch (error) {
+      console.error("Fetch user error:", error);
+    }
+  };
+
   return {
     userState,
     login,
@@ -98,5 +110,6 @@ export const useAuth = () => {
     getCurrentUser,
     isAuthenticated,
     getToken,
+    fetchUser,
   };
 };

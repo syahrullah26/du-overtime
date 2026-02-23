@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('overtime_logs', function (Blueprint $table) {
             $table->id();
-            $table->uuid('submission_id');
-            $table->uuid('action_by');
+            $table->unsignedBigInteger('submission_id');
+            $table->unsignedBigInteger('action_by');
             $table->string('action', 50);
             $table->string('old_status', 50)->nullable();
             $table->string('new_status', 50);

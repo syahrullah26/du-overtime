@@ -10,7 +10,7 @@ const form = reactive({
   name: "",
   email: "",
   role: "",
-  signature: "",
+  signature: null as File | string | null,
 });
 
 const loadData = async () => {
@@ -33,19 +33,70 @@ watch(
   { immediate: true },
 );
 
-const handleAvatarChange = (event: any) => {};
+const config = useRuntimeConfig();
+const getImageUrl = (path: string | null) => {
+  if (!path) return null;
+  if (path.startsWith("http")) return path;
+  return `http://localhost:8000/storage/${path}`;
+};
+
+const { userState, fetchUser } = useAuth();
+const { uploadProfilePicture, uploadSignature } = useUser();
+
+const isFile = (val: any): val is File => {
+  return typeof window !== "undefined" && val instanceof File;
+};
+
+const signaturePreviewUrl = computed(() => {
+  if (isFile(form.signature)) {
+    return URL.createObjectURL(form.signature);
+  }
+  return getImageUrl(userSelected.value?.signature);
+});
+
+const handleAvatarChange = async (event: any) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  try {
+    loadingForm.value = true;
+    await uploadProfilePicture(Number(userId.value), file);
+    await fetchUser();
+    await fetchUserById(userId.value);
+    alert("Profile picture updated successfully!");
+  } catch (error: any) {
+    console.error("Error uploading profile picture:", error);
+    alert("Failed to upload profile picture");
+  } finally {
+    loadingForm.value = false;
+  }
+};
 
 // update profile
 const updateProfile = async () => {
   loadingForm.value = true;
   try {
-    const response = await updateUser(form);
+    // 1. Upload signature if it's a File
+    if (isFile(form.signature)) {
+      await uploadSignature(Number(userId.value), form.signature);
+    }
+
+    // 2. Update other profile data
+    const response = await updateUser({
+      id: Number(form.id),
+      name: form.name,
+      email: form.email,
+      role: String(form.role),
+    });
+
     if (response) {
+      await fetchUser(); // Refresh session
       await fetchUserById(userId.value);
       alert("Profile updated successfully!");
     }
   } catch (error: any) {
     console.error("Error updating profile:", error.data || error.message);
+    alert("An error occurred while updating profile");
   } finally {
     loadingForm.value = false;
   }
@@ -131,7 +182,7 @@ watch(userId, loadData);
                 >
                   <img
                     :src="
-                      userSelected.avatar ||
+                      getImageUrl(userSelected.profile_picture) ||
                       `https://ui-avatars.com/api/?name=${userSelected.name}&background=111&color=fff&size=300`
                     "
                     class="w-full h-full object-cover"
@@ -240,7 +291,21 @@ watch(userId, loadData);
                       label="Upload Signature"
                       class="mb-3 block text-gray-400 uppercase tracking-[0.2em] font-black text-[10px]"
                     />
-                    <BaseInput v-model="form.signature" type="file" />
+                    <div class="space-y-4">
+                      <div
+                        v-if="form.signature || userSelected.signature"
+                        class="relative w-full h-32 bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden flex items-center justify-center p-4 group/sig"
+                      >
+                        <img
+                          :src="signaturePreviewUrl || ''"
+                          class="max-h-full object-contain"
+                        />
+                        <div
+                          class="absolute inset-0 bg-black/5 opacity-0 group-hover/sig:opacity-100 transition-opacity"
+                        ></div>
+                      </div>
+                      <BaseInput v-model="form.signature" type="file" />
+                    </div>
                   </div>
                 </div>
 
