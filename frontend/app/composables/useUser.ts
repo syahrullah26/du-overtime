@@ -46,8 +46,6 @@ export const useUser = () => {
   const updateUser = async (payload: EditProfilePayload) => {
     loading.value = true;
     try {
-      const formData = new FormData();
-
       const response = await useApiFetch<any>(`/users/${payload.id}`, {
         method: "PUT",
         body: payload,
@@ -55,6 +53,44 @@ export const useUser = () => {
       return response.data || response;
     } catch (error: any) {
       console.log("Error Update Profile :", error.data || error.message);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const uploadProfilePicture = async (id: number, file: File) => {
+    loading.value = true;
+    try {
+      const formData = new FormData();
+      formData.append("profile_picture", file);
+
+      const response = await useApiFetch<any>(`/users/${id}/profile-picture`, {
+        method: "POST",
+        body: formData,
+      });
+      return response.data || response;
+    } catch (error: any) {
+      console.error("Error uploading profile picture:", error.data || error.message);
+      throw error;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const uploadSignature = async (id: number, file: File) => {
+    loading.value = true;
+    try {
+      const formData = new FormData();
+      formData.append("signature", file);
+
+      const response = await useApiFetch<any>(`/users/${id}/signature`, {
+        method: "POST",
+        body: formData,
+      });
+      return response.data || response;
+    } catch (error: any) {
+      console.error("Error uploading signature:", error.data || error.message);
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -81,6 +117,8 @@ export const useUser = () => {
     fetchUsersByRole,
     updatePassword,
     updateUser,
+    uploadProfilePicture,
+    uploadSignature,
     userSelected,
     loading,
   };

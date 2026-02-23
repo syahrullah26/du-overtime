@@ -1,18 +1,19 @@
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
   avatar?: string;
-  role: "EMPLOYEE" | "PIC" | "C_LEVEL" | "HRD" | "FINANCE" | "SUPERADMIN";
-  dept_id: string;
-  department?: Department;
+  profile_picture?: string | null;
   signature?: string | null;
+  role: "EMPLOYEE" | "PIC" | "C_LEVEL" | "HRD" | "FINANCE" | "SUPERADMIN";
+  dept_id: number;
+  department?: Department;
   created_at?: string;
   updated_at: string;
 }
 
 export interface Department {
-  id: string;
+  id: number;
   name: string;
   created_at?: string;
   updated_at: string;
@@ -37,8 +38,8 @@ export interface ApiError {
 }
 
 export interface OvertimeSubmission {
-  id: string;
-  employee_id: string;
+  id: number;
+  employee_id: number;
   employee?: User;
   date: string;
   start_time: string;
@@ -46,13 +47,13 @@ export interface OvertimeSubmission {
   duration_min: number;
   status: OvertimeStatus;
   reason: string;
-  pic_id: string;
+  pic_id: number;
   pic?: User;
-  clevel_id: string;
+  clevel_id: number;
   clevel?: User;
-  // signature_pic: string | null;
-  // signature_clevel: string | null;
-  // signature_hrd: string | null;
+  signature_pic: string | null;
+  signature_clevel: string | null;
+  signature_hrd: string | null;
   applied_rate: number;
   total_pay: number;
   rejection_reason: string | null;
@@ -76,9 +77,9 @@ export interface PaginatedResponse<T> {
 }
 
 export interface OvertimeLog {
-  id: string;
-  submission_id: string;
-  action_by: string;
+  id: number;
+  submission_id: number;
+  action_by: number;
   action_by_user?: User;
   action: string;
   old_status: string | null;

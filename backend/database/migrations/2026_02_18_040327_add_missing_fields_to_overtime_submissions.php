@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('overtime_submissions', function (Blueprint $table) {
             $table->text('reason')->after('end_time')->nullable();
-            $table->uuid('pic_id')->after('reason')->nullable();
-            $table->uuid('clevel_id')->after('pic_id')->nullable();
+            $table->unsignedBigInteger('pic_id')->after('reason')->nullable();
+            $table->unsignedBigInteger('clevel_id')->after('pic_id')->nullable();
 
             $table->foreign('pic_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('clevel_id')->references('id')->on('users')->onDelete('set null');

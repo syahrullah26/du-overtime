@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { userState, logout } = useAuth();
 
-// Menghitung persentase kelengkapan profil (contoh)
+// Menghitung persentase kelengkapan profil
 const profileCompletion = ref(85);
 
 const stats = computed(() => [
@@ -30,6 +30,12 @@ const handleLogout = async () => {
   if (confirm("Apakah Anda yakin ingin keluar?")) {
     await logout();
   }
+};
+
+const getImageUrl = (path: string | null | undefined) => {
+  if (!path) return null;
+  if (path.startsWith("http")) return path;
+  return `http://localhost:8000/storage/${path}`;
 };
 </script>
 
@@ -116,7 +122,10 @@ const handleLogout = async () => {
                     class="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-2xl"
                   >
                     <img
-                      :src="`https://ui-avatars.com/api/?name=${userState?.name}&background=111&color=fff&size=200`"
+                      :src="
+                        getImageUrl(userState?.profile_picture) ||
+                        `https://ui-avatars.com/api/?name=${userState?.name}&background=111&color=fff&size=200`
+                      "
                       class="w-full h-full object-cover shadow-inner"
                     />
                   </div>
@@ -147,7 +156,7 @@ const handleLogout = async () => {
                   class="flex-1 text-center justfify-center md:text-left space-y-4"
                 >
                   <img
-                    :src="userState?.signature || ''"
+                    :src="getImageUrl(userState?.signature) || ''"
                     class="rounded-xl w-full h-32 object-cover"
                   />
                 </div>
@@ -262,7 +271,6 @@ const handleLogout = async () => {
   }
 }
 
-/* Custom Scrollbar for better UI if needed */
 ::-webkit-scrollbar {
   width: 6px;
 }
