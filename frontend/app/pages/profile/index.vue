@@ -1,8 +1,18 @@
 <script setup lang="ts">
 const { userState, logout } = useAuth();
 
-// Menghitung persentase kelengkapan profil (contoh)
-const profileCompletion = ref(85);
+const profileCompletion = computed(() => {
+  const user = userState.value;
+  if (!user) return 0;
+  const fields = [user.name, user.avatar, user.signature];
+
+  const completedFields = fields.filter(
+    (field) => field !== null && field !== undefined && field !== "",
+  ).length;
+  const percentage = (completedFields / fields.length) * 100;
+
+  return Math.round(percentage);
+});
 
 const stats = computed(() => [
   {
