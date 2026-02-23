@@ -6,7 +6,7 @@ export interface User {
   role: "EMPLOYEE" | "PIC" | "C_LEVEL" | "HRD" | "FINANCE" | "SUPERADMIN";
   dept_id: string;
   department?: Department;
-  signature?: File | string | null;
+  signature?: string | null;
   created_at?: string;
   updated_at: string;
 }

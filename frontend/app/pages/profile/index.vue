@@ -141,6 +141,16 @@ const handleLogout = async () => {
                     {{ userState?.email }}
                   </p>
                 </div>
+                <hr class="border border-gray-200" />
+                <div
+                  v-if="userState?.signature != null"
+                  class="flex-1 text-center justfify-center md:text-left space-y-4"
+                >
+                  <img
+                    :src="userState?.signature || ''"
+                    class="rounded-xl w-full h-32 object-cover"
+                  />
+                </div>
 
                 <div
                   class="flex flex-wrap gap-3 justify-center md:justify-start pt-2"
