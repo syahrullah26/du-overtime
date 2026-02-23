@@ -46,6 +46,8 @@ export const useUser = () => {
   const updateUser = async (payload: EditProfilePayload) => {
     loading.value = true;
     try {
+      const formData = new FormData();
+
       const response = await useApiFetch<any>(`/users/${payload.id}`, {
         method: "PUT",
         body: payload,
@@ -61,13 +63,10 @@ export const useUser = () => {
   const updatePassword = async (payload: ChangePasswordPayload) => {
     loading.value = true;
     try {
-      const response = await useApiFetch<any>(
-        `/users/${payload.id}/password`,
-        {
-          method: "PUT",
-          body: payload,
-        },
-      );
+      const response = await useApiFetch<any>(`/users/${payload.id}/password`, {
+        method: "PUT",
+        body: payload,
+      });
       return response.data || response;
     } catch (error: any) {
       console.error("Error updating password:", error.data || error.message);

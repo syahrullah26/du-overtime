@@ -10,4 +10,6 @@ export interface EditProfilePayload {
   name: string;
   email: string;
   role: String;
+  avatar?: File | string | null;
+  signature?: File | string | null;
 }

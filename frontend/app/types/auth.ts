@@ -6,6 +6,7 @@ export interface User {
   role: "EMPLOYEE" | "PIC" | "C_LEVEL" | "HRD" | "FINANCE" | "SUPERADMIN";
   dept_id: string;
   department?: Department;
+  signature?: File | string | null;
   created_at?: string;
   updated_at: string;
 }
@@ -49,9 +50,9 @@ export interface OvertimeSubmission {
   pic?: User;
   clevel_id: string;
   clevel?: User;
-  signature_pic: string | null;
-  signature_clevel: string | null;
-  signature_hrd: string | null;
+  // signature_pic: string | null;
+  // signature_clevel: string | null;
+  // signature_hrd: string | null;
   applied_rate: number;
   total_pay: number;
   rejection_reason: string | null;
