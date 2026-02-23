@@ -18,8 +18,8 @@ const stats = computed(() => [
     color: "bg-green-50 text-green-600",
   },
   {
-    label: "Level",
-    value: userState.value?.role || "Staff",
+    label: "Department",
+    value: userState.value?.department?.name || "Staff",
     icon: "👑",
     color: "bg-amber-50 text-amber-600",
   },

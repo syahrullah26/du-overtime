@@ -1,9 +1,18 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   name: string;
   role: string;
+  department: {
+    name: string;
+  };
   avatar?: string;
 }>();
+
+// switch (props.role) {
+//   case "C_LEVEL":
+//     const newRole = "C Level";
+//     break;
+// }
 </script>
 
 <template>
@@ -24,7 +33,7 @@ defineProps<{
         <div class="flex items-center justify-center gap-4">
           <div class="flex-1 h-px bg-[#7b5902]"></div>
           <p class="text-gray-400 text-xs uppercase font-bold tracking-widest">
-            {{ role }}
+            {{ department?.name || role }}
           </p>
           <div class="flex-1 h-px bg-[#7b5902]"></div>
         </div>

@@ -247,7 +247,7 @@ const isActive = (path: string) =>
                 <span class="text-[var(--gold-dark)]">{{
                   userState.name
                 }}</span>
-                <span>{{ userState.role }}</span>
+                <span>{{ userState.department?.name }}</span>
               </div>
             </div>
           </NuxtLink>

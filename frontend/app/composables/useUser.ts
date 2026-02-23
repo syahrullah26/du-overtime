@@ -1,7 +1,7 @@
 import type {
   ChangePasswordPayload,
   EditProfilePayload,
-} from "~/types/interface";
+} from "~/types/payload";
 
 export const useUser = () => {
   const userSelected = ref<any>(null);

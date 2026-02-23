@@ -10,6 +10,7 @@ const form = reactive({
   name: "",
   email: "",
   role: "",
+  signature: "",
 });
 
 const loadData = async () => {
@@ -231,6 +232,13 @@ watch(userId, loadData);
                       class="mb-3 block text-gray-400 uppercase tracking-[0.2em] font-black text-[10px]"
                     />
                     <BaseInput v-model="form.role" disabled />
+                  </div>
+                  <div class="md:col-span-2">
+                    <BaseLabel
+                      label="Upload Signature"
+                      class="mb-3 block text-gray-400 uppercase tracking-[0.2em] font-black text-[10px]"
+                    />
+                    <BaseInput v-model="form.signature" type="file" />
                   </div>
                 </div>
 
