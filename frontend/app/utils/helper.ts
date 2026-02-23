@@ -1,5 +1,4 @@
-
-// STATUS BADGE ATAU CLASS NYA 
+// STATUS BADGE ATAU CLASS NYA
 export const statusClass = (status: string) => {
   const base = "px-2 py-1 rounded-md text-xs font-bold ";
   if (status.startsWith("PENDING"))
@@ -8,7 +7,6 @@ export const statusClass = (status: string) => {
   if (status === "REJECTED") return base + "bg-red-100 text-red-700";
   return base + "bg-gray-100 text-gray-700";
 };
-
 
 //FORMAT RUPIAH
 export const formatCurrency = (amount: number) => {
@@ -50,4 +48,53 @@ export const formatTime = (date: string | Date | number): string => {
     console.error("FormatTime Error:", error);
     return "-";
   }
+};
+
+export const getAvatarUrl = (path: string | null | undefined) => {
+  if (!path) return "/images/default-avatar.png";
+  if (path.startsWith("http")) return path;
+
+  const baseUrl = "http://localhost:8000/storage/";
+
+  return `${baseUrl}/storage/${path}`;
+};
+
+export const getSignatureUrl = (path: string | null | undefined) => {
+  if (!path) return null;
+
+  if (path.startsWith("http")) return path;
+  const baseUrl = "http://localhost:8000/storage/";
+
+  return `${baseUrl}/storage/${path}`;
+};
+
+/**
+ * menghitung persentase profile completion
+ * @param user
+ * @returns
+ */
+export const calculateProfileCompletion = (user: any): number => {
+  if (!user) return 0;
+
+  const fields = [user.name, user.profile_picture, user.signature];
+
+  const completedFields = fields.filter(
+    (field) => field !== null && field !== undefined && field !== "",
+  ).length;
+
+  const percentage = (completedFields / fields.length) * 100;
+
+  return Math.round(percentage);
+};
+
+export const completionClass = (percentage: number) => {
+  if (percentage < 50) {
+    return "bg-red-500 text-white shadow-red-100";
+  }
+
+  if (percentage < 100) {
+    return "bg-slate-800 text-slate-100";
+  }
+
+  return "bg-[var(--gold-main)] text-black shadow-[var(--gold-main)] shadow-sm";
 };

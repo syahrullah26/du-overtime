@@ -38,7 +38,7 @@ export interface ApiError {
 }
 
 export interface OvertimeSubmission {
-  id: number;
+  id: string;
   employee_id: number;
   employee?: User;
   date: string;

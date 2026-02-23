@@ -33,6 +33,10 @@ watch(
   { immediate: true },
 );
 
+const profileCompletion = computed(() => {
+  return calculateProfileCompletion(userSelected.value);
+});
+
 const config = useRuntimeConfig();
 const getImageUrl = (path: string | null) => {
   if (!path) return null;
@@ -237,14 +241,35 @@ watch(userId, loadData);
                     >Verified</span
                   >
                 </div>
-                <div
-                  class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden"
-                >
+                <div class="space-y-2">
+                  <div class="flex justify-between items-end">
+                    <span
+                      class="text-xs font-bold"
+                      :class="
+                        profileCompletion === 100
+                          ? 'text-[var(--gold-main)]'
+                          : 'text-gray-600'
+                      "
+                    >
+                      {{ profileCompletion }}%
+                    </span>
+                  </div>
+
                   <div
-                    class="h-full bg-[var(--gold-dark)] w-full rounded-full transition-all duration-1000"
-                    data-aos="slide-right"
-                    data-aos-delay="600"
-                  ></div>
+                    class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden"
+                  >
+                    <div
+                      class="h-full transition-all duration-1000 ease-out rounded-full"
+                      :class="
+                        profileCompletion === 100
+                          ? 'bg-[var(--gold-main)]'
+                          : 'bg-[var(--gold-dark)]'
+                      "
+                      :style="{ width: `${profileCompletion}%` }"
+                      data-aos="slide-right"
+                      data-aos-delay="600"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>

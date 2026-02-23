@@ -2,16 +2,7 @@
 const { userState, logout } = useAuth();
 
 const profileCompletion = computed(() => {
-  const user = userState.value;
-  if (!user) return 0;
-  const fields = [user.name, user.avatar, user.signature];
-
-  const completedFields = fields.filter(
-    (field) => field !== null && field !== undefined && field !== "",
-  ).length;
-  const percentage = (completedFields / fields.length) * 100;
-
-  return Math.round(percentage);
+  return calculateProfileCompletion(userState.value);
 });
 
 const stats = computed(() => [
@@ -101,35 +92,41 @@ const getImageUrl = (path: string | null | undefined) => {
             <div
               class="relative bg-white rounded-[2.4rem] p-10 flex flex-col md:flex-row gap-10 items-center"
             >
-              <div class="relative flex-shrink-0">
-                <svg class="w-40 h-40 transform -rotate-90">
-                  <circle
-                    cx="80"
-                    cy="80"
-                    r="70"
+              <div class="relative flex-shrink-0 group">
+                <svg class="w-40 h-40 transform">
+                  <rect
+                    x="10"
+                    y="10"
+                    width="140"
+                    height="140"
+                    rx="24"
+                    fill="transparent"
                     stroke="currentColor"
                     stroke-width="8"
-                    fill="transparent"
                     class="text-gray-100"
                   />
-                  <circle
-                    cx="80"
-                    cy="80"
-                    r="70"
+                  <rect
+                    x="10"
+                    y="10"
+                    width="140"
+                    height="140"
+                    rx="24"
+                    fill="transparent"
                     stroke="currentColor"
                     stroke-width="8"
-                    fill="transparent"
-                    :stroke-dasharray="440"
-                    :stroke-dashoffset="440 - (440 * profileCompletion) / 100"
                     stroke-linecap="round"
+                    :stroke-dasharray="560"
+                    :stroke-dashoffset="560 - (560 * profileCompletion) / 100"
                     class="text-[var(--gold-main)] transition-all duration-1000 ease-out"
+                    style="transform-origin: center; transform: rotate(-90deg)"
                   />
                 </svg>
+
                 <div
                   class="absolute inset-0 flex items-center justify-center p-4"
                 >
                   <div
-                    class="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-2xl"
+                    class="w-[116px] h-[116px] rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gray-200"
                   >
                     <img
                       :src="
@@ -140,8 +137,9 @@ const getImageUrl = (path: string | null | undefined) => {
                     />
                   </div>
                 </div>
+
                 <div
-                  class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-3 py-1 rounded-full font-bold"
+                  class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-3 py-1.5 rounded-xl font-black tracking-widest uppercase shadow-xl"
                 >
                   {{ profileCompletion }}% Complete
                 </div>
@@ -161,15 +159,6 @@ const getImageUrl = (path: string | null | undefined) => {
                   </p>
                 </div>
                 <hr class="border border-gray-200" />
-                <div
-                  v-if="userState?.signature != null"
-                  class="flex-1 text-center justfify-center md:text-left space-y-4"
-                >
-                  <img
-                    :src="getImageUrl(userState?.signature) || ''"
-                    class="rounded-xl w-full h-32 object-cover"
-                  />
-                </div>
 
                 <div
                   class="flex flex-wrap gap-3 justify-center md:justify-start pt-2"
