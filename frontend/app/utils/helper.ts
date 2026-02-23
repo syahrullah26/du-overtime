@@ -1,3 +1,4 @@
+import type { OvertimeSubmission } from "~/types/auth";
 // STATUS BADGE ATAU CLASS NYA
 export const statusClass = (status: string) => {
   const base = "px-2 py-1 rounded-md text-xs font-bold ";
@@ -85,4 +86,36 @@ export const completionClass = (percentage: number) => {
   }
 
   return "bg-[var(--gold-main)] text-black shadow-[var(--gold-main)] shadow-sm";
+};
+
+export const filterPendingApprovals = (
+  submissions: OvertimeSubmission[],
+  userId: string | number | undefined,
+  role: string | undefined,
+): OvertimeSubmission[] => {
+  if (!submissions || !userId) return [];
+
+  const currentUserId = String(userId);
+
+  return submissions.filter((item) => {
+    const isOwner = String(item.employee_id) === currentUserId;
+    if (isOwner) return false;
+    if (
+      item.status === "PENDING_PIC" &&
+      String(item.pic_id) === currentUserId
+    ) {
+      return true;
+    }
+    if (
+      item.status === "PENDING_C_LEVEL" &&
+      String(item.clevel_id) === currentUserId
+    ) {
+      return true;
+    }
+    if (item.status === "PENDING_HRD" && role === "HRD") {
+      return true;
+    }
+
+    return false;
+  });
 };

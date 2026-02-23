@@ -16,14 +16,15 @@ const activeTab = ref("waiting_my_approval");
 const filteredData = computed(() => {
   return props.submissions.filter((item: OvertimeSubmission) => {
     if (activeTab.value === "waiting_my_approval") {
-      return item.status === "PENDING_C_LEVEL";
+      return (
+        item.status === "PENDING_C_LEVEL" && item.clevel_id === props.user?.id
+      );
     }
   });
 });
 
 const totalWaitingCLevel = computed(() => {
-  return props.submissions.filter((item) => item.status === "PENDING_C_LEVEL")
-    .length;
+  return filteredData.value.length;
 });
 
 const stats = computed(() => {

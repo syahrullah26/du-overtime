@@ -49,7 +49,9 @@ const filteredData = computed(() => {
   return props.submissions.filter((item: OvertimeSubmission) => {
     if (activeTab.value === "process") {
       return (
-        item.status === "PENDING_PIC" && item.employee_id !== props.user?.id
+        item.status === "PENDING_PIC" &&
+        item.employee_id !== props.user?.id &&
+        item.pic_id === props.user?.id
       );
     } else {
       return item.employee_id === props.user?.id;
@@ -58,10 +60,7 @@ const filteredData = computed(() => {
 });
 
 const totalProcess = computed(() => {
-  return props.submissions.filter(
-    (item: OvertimeSubmission) =>
-      item.status === "PENDING_PIC" && item.employee_id !== props.user?.id,
-  ).length;
+  return filteredData.value.length;
 });
 
 const stats = computed(() => {

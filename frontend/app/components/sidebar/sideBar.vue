@@ -43,7 +43,7 @@ const menus = [
         name: "Approval Overtime",
         to: "/overtime/view/PicOvertime",
         icon: "📋",
-        role: ["PIC"],
+        role: ["PIC","EMPLOYEE"],
       },
       {
         name: "Overtime Logs",

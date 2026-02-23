@@ -65,6 +65,8 @@ const fetchDetail = async () => {
   }
 };
 
+console.log(submission);
+
 const getStepperStatus = (
   item: OvertimeSubmission,
   level: "PIC" | "CLEVEL" | "HRD",

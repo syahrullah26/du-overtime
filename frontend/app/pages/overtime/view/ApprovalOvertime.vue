@@ -15,7 +15,6 @@ const {
   rejectOvertime,
 } = useOvertime();
 
-
 const activeTab = ref("PENDING_PIC");
 
 const handleApprove = async (id: string) => {
@@ -46,36 +45,17 @@ const handleReject = async (id: string) => {
 };
 
 const filteredData = computed(() => {
-  if (!submissions.value) return [];
-
-  return submissions.value.filter((item: OvertimeSubmission) => {
-    const role = userState.value?.role;
-    const isOwner = item.employee_id === userState.value?.id;
-
-    if (activeTab.value === "PENDING_PIC") {
-      if (isOwner) return false;
-
-      if (role === "PIC") return item.status === "PENDING_PIC";
-      if (role === "C_LEVEL") return item.status === "PENDING_C_LEVEL";
-      if (role === "HRD") return item.status === "PENDING_HRD";
-      return false;
-    }
-    return false;
-  });
+  if (activeTab.value === "PENDING_PIC") {
+    return filterPendingApprovals(
+      submissions.value,
+      userState.value?.id,
+      userState.value?.role,
+    );
+  }
+  return [];
 });
 
-const totalProcess = computed(() => {
-  if (!submissions.value) return 0;
-  const role = userState.value?.role;
-
-  return submissions.value.filter((item: OvertimeSubmission) => {
-    if (item.employee_id === userState.value?.id) return false;
-    if (role === "PIC") return item.status === "PENDING_PIC";
-    if (role === "C_LEVEL") return item.status === "PENDING_C_LEVEL";
-    if (role === "HRD") return item.status === "PENDING_HRD";
-    return false;
-  }).length;
-});
+const totalProcess = computed(() => filteredData.value.length);
 const pendingCount = computed(() => {
   if (!submissions.value) return 0;
 
