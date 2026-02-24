@@ -58,7 +58,10 @@ const menus = [
     name: "Approval Finance",
     icon: "💸",
     role: ["FINANCE", "SUPERADMIN"],
-    children: [{ name: "View Overtime", to: "/overtime/view", icon: "📄" }],
+    children: [
+      { name: "View Overtime", to: "/overtime/view", icon: "📋" },
+      { name: "Overtime History", to: "/overtime/view/history", icon: "📄" },
+    ],
   },
   {
     name: "Approval HRD",

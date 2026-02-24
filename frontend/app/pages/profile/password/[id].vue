@@ -4,7 +4,7 @@ const userId = computed(() => route.params.id as string);
 const { fetchUserById, updatePassword, userSelected, loading } = useUser();
 
 const passwordForm = reactive({
-  id: userId.value || "",
+  id: Number(userId.value),
   current_password: "",
   new_password: "",
   new_password_confirmation: "",
@@ -25,7 +25,8 @@ const handleChangePassword = async () => {
     }
   } catch (error: any) {
     console.error("Error Update Password:", error.data || error.message);
-    const message = error.data?.message || "Failed to update password. Please try again.";
+    const message =
+      error.data?.message || "Failed to update password. Please try again.";
     alert(message);
   }
 };

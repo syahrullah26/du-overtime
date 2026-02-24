@@ -43,39 +43,46 @@ const searchQuery = ref("");
 const filteredSubmissions = computed(() => {
   if (!submissions.value) return [];
 
+  const userId = userState.value?.id;
+  const role = userState.value?.role;
+  const searchTerm = searchQuery.value.toLowerCase();
+
   return submissions.value.filter((item: OvertimeSubmission) => {
+    const isOwner = item.employee_id === userId;
     let matchTab = false;
-    if (activeTab.value === "APPROVAL_HISTORY") {
-      const role = userState.value?.role;
+    if (activeTab.value === "PENDING_PIC") {
+      if (isOwner) return false;
+
+      if (item.status === "PENDING_PIC" && item.pic_id === userId)
+        matchTab = true;
+      else if (item.status === "PENDING_C_LEVEL" && item.clevel_id === userId)
+        matchTab = true;
+      else if (item.status === "PENDING_HRD" && role === "HRD") matchTab = true;
+      else if (
+        role === "SUPERADMIN" &&
+        ["PENDING_PIC", "PENDING_C_LEVEL", "PENDING_HRD"].includes(item.status)
+      )
+        matchTab = true;
+    } else if (activeTab.value === "COMPLETED") {
+      matchTab = isOwner && item.status === "COMPLETED";
+    } else if (activeTab.value === "REJECTED") {
+      matchTab = isOwner && item.status === "REJECTED";
+    } else if (activeTab.value === "APPROVAL_HISTORY") {
+      if (isOwner) return false;
+
       if (role === "PIC") {
-        matchTab =
-          item.pic_id === userState.value?.id && item.status !== "PENDING_PIC";
+        matchTab = item.pic_id === userId && item.status !== "PENDING_PIC";
       } else if (role === "C_LEVEL") {
         matchTab =
-          item.clevel_id === userState.value?.id &&
+          item.clevel_id === userId &&
           !["PENDING_PIC", "PENDING_C_LEVEL"].includes(item.status);
-      } else if (role === "HRD") {
-        matchTab = item.status === "COMPLETED";
-      } else if (role === "SUPERADMIN") {
-        matchTab = item.status === "COMPLETED" || item.status === "REJECTED";
+      } else if (role === "HRD" || role === "SUPERADMIN") {
+        matchTab = ["COMPLETED", "REJECTED"].includes(item.status);
       }
-    } else if (activeTab.value === "PENDING_PIC") {
-      const role = userState.value?.role;
-      if (role === "PIC") matchTab = item.status === "PENDING_PIC";
-      else if (role === "C_LEVEL") matchTab = item.status === "PENDING_C_LEVEL";
-      else if (role === "HRD") matchTab = item.status === "PENDING_HRD";
-      else
-        matchTab = ["PENDING_PIC", "PENDING_C_LEVEL", "PENDING_HRD"].includes(
-          item.status,
-        );
-    } else {
-      matchTab = item.status === activeTab.value;
     }
 
-    const searchTerm = searchQuery.value.toLowerCase();
     const employeeName = item.employee?.name?.toLowerCase() || "";
     const submissionDate = item.date?.toLowerCase() || "";
-
     const matchSearch =
       employeeName.includes(searchTerm) || submissionDate.includes(searchTerm);
 

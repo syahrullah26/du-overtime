@@ -2,10 +2,11 @@ import type {
   ChangePasswordPayload,
   EditProfilePayload,
 } from "~/types/payload";
-
+import type { Department } from "~/types/auth";
 export const useUser = () => {
   const userSelected = ref<any>(null);
   const loading = ref(false);
+  const allDept = ref<Department[]>([]);
 
   const fetchAllUsers = async () => {
     try {
@@ -129,6 +130,22 @@ export const useUser = () => {
     }
   };
 
+  const fetchAllDept = async () => {
+    try {
+      loading.value = true;
+      const response = await useApiFetch<any>(`/departments`);
+      allDept.value = response.data || response;
+      return allDept;
+    } catch (error: any) {
+      console.error(
+        "Error Fetching All Departments Data:",
+        error.data || error.message,
+      );
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     fetchAllUsers,
     fetchUserById,
@@ -137,7 +154,9 @@ export const useUser = () => {
     updateUser,
     uploadProfilePicture,
     uploadSignature,
+    fetchAllDept,
     userSelected,
     loading,
+    allDept,
   };
 };

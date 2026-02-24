@@ -76,6 +76,7 @@ export const calculateProfileCompletion = (user: any): number => {
   return Math.round(percentage);
 };
 
+// Menentukan class untuk completion
 export const completionClass = (percentage: number) => {
   if (percentage < 50) {
     return "bg-red-500 text-white shadow-red-100";
@@ -118,4 +119,37 @@ export const filterPendingApprovals = (
 
     return false;
   });
+};
+
+// Periode Payroll
+export const getPayrollPeriod = (dateString: string) => {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = date.getMonth();
+  const year = date.getFullYear();
+
+  let periodMonth = day > 20 ? month + 1 : month;
+  let periodYear = year;
+
+  if (periodMonth > 11) {
+    periodMonth = 0;
+    periodYear++;
+  }
+
+  const monthNames = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
+  return `${monthNames[periodMonth]} ${periodYear}`;
 };
