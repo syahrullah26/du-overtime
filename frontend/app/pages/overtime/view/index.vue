@@ -9,6 +9,9 @@ const activeTab = ref("PENDING_PIC");
 const { userState } = useAuth();
 const { submissions, fetchSubmissions, loading } = useOvertime();
 
+onMounted(() => {
+  fetchSubmissions();
+});
 const period = [
   {
     label: "Periode Bulan Ini",
@@ -90,13 +93,6 @@ const filteredSubmissions = computed(() => {
   });
 });
 
-// const pedingTabs = computed(() =>
-//   ["PENDING_PIC", "PENDING_C_LEVEL", "PENDING_HRD"].includes(activeTab.value),
-// );
-// const setPendingTabs = () => {
-//   activeTab.value = "PENDING_PIC";
-// };
-
 const getStepperStatus = (
   item: OvertimeSubmission,
 
@@ -120,10 +116,6 @@ const getStepperStatus = (
   }
   return "pending";
 };
-
-onMounted(async () => {
-  await fetchSubmissions();
-});
 </script>
 <template>
   <div class="min-h-screen bg-[var(--white-bone)] p-8">

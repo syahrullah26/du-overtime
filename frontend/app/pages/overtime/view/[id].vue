@@ -16,14 +16,23 @@ const canApprove = computed(() => {
   if (!submission.value || !userState.value) return false;
   const role = userState.value.role;
   const status = submission.value.status;
+  const picId = submission.value.pic_id;
 
-  const allowedTransitions: Record<string, string> = {
-    PENDING_PIC: "PIC",
-    PENDING_C_LEVEL: "C_LEVEL",
-    PENDING_HRD: "HRD",
-  };
+  if (
+    role === "EMPLOYEE" &&
+    picId === userState.value.id &&
+    status === "PENDING_PIC"
+  ) {
+    return true;
+  } else {
+    const allowedTransitions: Record<string, string> = {
+      PENDING_PIC: "PIC",
+      PENDING_C_LEVEL: "C_LEVEL",
+      PENDING_HRD: "HRD",
+    };
 
-  return allowedTransitions[status] === role;
+    return allowedTransitions[status] === role;
+  }
 });
 
 const handleApprove = async () => {

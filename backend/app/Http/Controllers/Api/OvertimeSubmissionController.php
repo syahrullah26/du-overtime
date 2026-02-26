@@ -35,9 +35,12 @@ class OvertimeSubmissionController extends Controller
             $query->dateRange($request->start_date, $request->end_date);
         }
 
-        // Filter current user roleny employee
+        // Filter untuk user dengan role EMPLOYEE
         if ($request->user()->role === 'EMPLOYEE') {
-            $query->byEmployee($request->user()->id);
+            $query->where(function ($q) use ($request) {
+                $q->where('employee_id', $request->user()->id)
+                    ->orWhere('pic_id', $request->user()->id);
+            });
         }
 
         //superadmin no filter

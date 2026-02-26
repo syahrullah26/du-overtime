@@ -12,6 +12,12 @@ const props = defineProps<{
   loading: boolean;
 }>();
 
+const filteredData = computed(() => {
+  return props.submissions.filter((item: OvertimeSubmission) => {
+    return item.status != "COMPLETED" && item.status != "REJECTED";
+  });
+});
+
 const stats = computed(() => {
   const totalGross = props.submissions.reduce(
     (acc, curr) => acc + (curr.total_pay || 0),
@@ -102,15 +108,17 @@ const getStepperStatus = (
         </NuxtLink>
       </div>
 
-      <OvertimeTable :headers="['Tanggal', 'Durasi', 'Progress', 'Estimasi']">
+      <OvertimeTable
+        :headers="['Tanggal', 'Durasi', 'Progress', 'Estimasi', 'Action']"
+      >
         <template #body-content>
-          <tr v-if="submissions.length === 0">
-            <td colspan="4" class="p-10 text-center text-gray-400">
+          <tr v-if="filteredData.length === 0">
+            <td colspan="5" class="p-10 text-center text-gray-400">
               Belum ada data pengajuan lembur.
             </td>
           </tr>
           <tr
-            v-for="item in submissions"
+            v-for="item in filteredData"
             :key="item.id"
             class="hover:bg-[var(--white-bone)] transition-colors border-b border-gray-50 last:border-0"
           >
@@ -136,6 +144,14 @@ const getStepperStatus = (
               class="p-6 text-right text-[var(--gold-main)] font-black text-lg"
             >
               {{ formatCurrency(item.total_pay) }}
+            </td>
+            <td class="p-6 items-center">
+              <NuxtLink
+                :to="`/overtime/view/${item.id}`"
+                class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
+              >
+                <button class="hover:scale-125 transition-all">🔍</button>
+              </NuxtLink>
             </td>
           </tr>
         </template>
