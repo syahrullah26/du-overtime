@@ -86,32 +86,8 @@ const getStepperStatus = (
   }
   return "pending";
 };
-//get user by id buat pic sama clevel
-// const { fetchUserById } = useUser();
-// const picName = ref("Loading...");
-// const clevelName = ref("Loading...");
-
-// const loadApproverNames = async () => {
-//   if (!submission.value) return;
-
-//   const picData = (await fetchUserById(submission.value.pic_id)) as any;
-//   const clevelData = (await fetchUserById(submission.value.clevel_id)) as any;
-
-//   picName.value = picData?.name || "Not Assigned";
-//   clevelName.value = clevelData?.name || "Not Assigned";
-// };
-
-// watch(
-//   () => submission.value,
-//   (newVal) => {
-//     if (newVal) loadApproverNames();
-//   },
-//   { immediate: true },
-// );
-
 onMounted(fetchDetail);
 
-console.log("submission data : ", submission);
 const stats = computed(() => {
   if (!submission.value) return [];
   return [
@@ -141,7 +117,7 @@ const stats = computed(() => {
     >
       <div class="flex items-center gap-5">
         <NuxtLink
-          to="/overtime/view"
+          @click.prevent="$router.back()"
           class="group flex items-center justify-center w-12 h-12 bg-white border border-gray-200 text-gray-600 rounded-2xl shadow-sm hover:shadow-md hover:border-[var(--gold-main)] hover:text-[var(--gold-main)] transition-all duration-300"
           title="Kembali"
         >

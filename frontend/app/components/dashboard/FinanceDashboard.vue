@@ -107,7 +107,7 @@ const getStepperStatus = (
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#F8F9FA] p-4 md:p-8">
+  <div class="min-h-screen bg-[var(--white-bone)] p-4 md:p-8">
     <header
       class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10"
     >

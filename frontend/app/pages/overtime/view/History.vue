@@ -52,7 +52,7 @@ const totalRekap = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#F8F9FA] p-4 md:p-8">
+  <div class="min-h-screen bg-[var(--white-bone)] p-4 md:p-8">
     <header
       class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-4"
     >
@@ -138,7 +138,7 @@ const totalRekap = computed(() => {
             v-model="searchQuery"
             type="text"
             placeholder="Ketik nama karyawan..."
-            class="w-full pl-12 pr-5 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-[var(--gold-main)]"
+            class="w-full pl-12 pr-5 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold focus:text-black outline-none focus:ring-2 focus:ring-[var(--gold-main)]"
           />
         </div>
       </div>
@@ -169,6 +169,11 @@ const totalRekap = computed(() => {
               class="p-6 text-right text-[10px] font-black uppercase text-gray-400 tracking-widest"
             >
               Nominal
+            </th>
+            <th
+              class="p-6 text-right text-[10px] font-black uppercase text-gray-400 tracking-widest"
+            >
+              Action
             </th>
           </tr>
         </thead>
@@ -246,6 +251,15 @@ const totalRekap = computed(() => {
               >
                 {{ formatCurrency(item.total_pay) }}
               </span>
+            </td>
+            <td class="p-6 text-right">
+              <NuxtLink :to="`/overtime/view/${item.id}`">
+                <button
+                  class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
+                >
+                  🔍
+                </button>
+              </NuxtLink>
             </td>
           </tr>
 
