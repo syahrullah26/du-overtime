@@ -1,14 +1,47 @@
 <script setup lang="ts">
+import { getTotalHoursByPeriod } from "~/utils/helper";
 const { userState, logout } = useAuth();
+
+const { fetchSubmissions, submissions } = useOvertime();
+
+onMounted(async () => {
+  await fetchSubmissions();
+});
 
 const profileCompletion = computed(() => {
   return calculateProfileCompletion(userState.value);
 });
 
+const totalLembur = computed(() => {
+  return getTotalHoursByPeriod(submissions.value, userState.value?.id);
+});
+
+// const totalLembur = computed(() => {
+//   const userId = userState.value?.id;
+//   if (!userId) return "0.0";
+
+//   const currentPeriod = getPayrollPeriod(new Date().toISOString());
+
+//   const totalHours = submissions.value.reduce((total, item) => {
+//     if (item.employee_id !== userId) return total;
+//     const itemPeriod = getPayrollPeriod(item.created_at);
+//     if (itemPeriod === currentPeriod) {
+//       const start = new Date(item.start_time);
+//       const end = new Date(item.end_time);
+//       const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+//       return total + (hours > 0 ? hours : 0);
+//     }
+
+//     return total;
+//   }, 0);
+
+//   return totalHours.toFixed(1);
+// });
+
 const stats = computed(() => [
   {
     label: "Total Lembur",
-    value: "24.5h",
+    value: totalLembur.value + "Jam",
     icon: "⏱️",
     color: "bg-blue-50 text-blue-600",
   },
@@ -32,7 +65,6 @@ const handleLogout = async () => {
     await logout();
   }
 };
-
 </script>
 
 <template>

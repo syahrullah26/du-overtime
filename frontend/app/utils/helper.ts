@@ -170,7 +170,44 @@ export const getPayrollPeriod = (dateString: string) => {
 
   return `${monthNames[periodMonth]} ${periodYear}`;
 };
+// get totalLembur pada profile
+// utils/helper.ts
 
+/**
+ * Menghitung total jam lembur untuk user tertentu dalam periode payroll saat ini
+ */
+export const getTotalHoursByPeriod = (
+  submissions: any[],
+  targetUserId: number | string | undefined,
+): string => {
+  if (!targetUserId || !submissions || !Array.isArray(submissions))
+    return "0.0";
+  const currentPeriod = getPayrollPeriod(new Date().toISOString());
+
+  const totalMinutes = submissions.reduce((total, item) => {
+    if (Number(item.employee_id) !== Number(targetUserId)) return total;
+
+    if (item.status !== "COMPLETED") return total;
+
+    const itemPeriod = getPayrollPeriod(item.created_at);
+    if (itemPeriod === currentPeriod) {
+      const start = new Date(item.start_time).getTime();
+      const end = new Date(item.end_time).getTime();
+
+      const diffMs = end - start;
+      if (diffMs > 0) {
+        const minutes = diffMs / (1000 * 60);
+        return total + minutes;
+      }
+    }
+
+    return total;
+  }, 0);
+
+  return (totalMinutes / 60).toFixed(1);
+};
+
+// get action button color pada log overtime
 export const getActionColor = (action: string) => {
   switch (action) {
     case "SUBMIT":
