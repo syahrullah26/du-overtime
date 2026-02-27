@@ -48,14 +48,18 @@ class OvertimeSubmissionController extends Controller
 
         // Filter pending pengajuan dari PIC, C_LEVEL, HRD
         if ($request->has('pending_for_me') && $request->pending_for_me) {
-            $statusMap = [
-                'PIC' => OvertimeSubmission::STATUS_PENDING_PIC,
-                'C_LEVEL' => OvertimeSubmission::STATUS_PENDING_C_LEVEL,
-                'HRD' => OvertimeSubmission::STATUS_PENDING_HRD,
-            ];
-
-            if (isset($statusMap[$request->user()->role])) {
-                $query->byStatus($statusMap[$request->user()->role]);
+            $user = $request->user();
+            
+            if ($user->role === 'HRD') {
+                $query->byStatus(OvertimeSubmission::STATUS_PENDING_HRD);
+            } elseif ($user->role === 'C_LEVEL') {
+                $query->byStatus(OvertimeSubmission::STATUS_PENDING_C_LEVEL);
+            } elseif ($user->role === 'PIC') {
+                $query->byStatus(OvertimeSubmission::STATUS_PENDING_PIC);
+            } elseif ($user->role === 'EMPLOYEE') {
+                // If employee is a PIC, they might have pending tasks
+                $query->where('status', OvertimeSubmission::STATUS_PENDING_PIC)
+                      ->where('pic_id', $user->id);
             }
         }
 
@@ -190,7 +194,7 @@ class OvertimeSubmissionController extends Controller
         $submission = OvertimeSubmission::findOrFail($id);
         $user = $request->user();
 
-        if (!$submission->canBeApprovedBy($user->role)) {
+        if (!$submission->canBeApprovedBy($user)) {
             return response()->json([
                 'message' => 'You are not authorized to approve this submission at this stage',
             ], 403);
@@ -232,7 +236,7 @@ class OvertimeSubmissionController extends Controller
         $user = $request->user();
 
         // Check if user can reject this submission
-        if (!$submission->canBeApprovedBy($user->role)) {
+        if (!$submission->canBeApprovedBy($user)) {
             return response()->json([
                 'message' => 'You are not authorized to reject this submission at this stage',
             ], 403);

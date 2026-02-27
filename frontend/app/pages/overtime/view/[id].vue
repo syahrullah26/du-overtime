@@ -14,25 +14,25 @@ const submission = ref<OvertimeSubmission | null>(null);
 
 const canApprove = computed(() => {
   if (!submission.value || !userState.value) return false;
-  const role = userState.value.role;
+  const user = userState.value;
   const status = submission.value.status;
-  const picId = submission.value.pic_id;
 
-  if (
-    role === "EMPLOYEE" &&
-    picId === userState.value.id &&
-    status === "PENDING_PIC"
-  ) {
-    return true;
-  } else {
-    const allowedTransitions: Record<string, string> = {
-      PENDING_PIC: "PIC",
-      PENDING_C_LEVEL: "C_LEVEL",
-      PENDING_HRD: "HRD",
-    };
+  // Superadmin can always approve
+  if (user.role === "SUPERADMIN") return true;
 
-    return allowedTransitions[status] === role;
+  if (status === "PENDING_PIC") {
+    return user.role === "PIC" || user.id === submission.value.pic_id;
   }
+
+  if (status === "PENDING_C_LEVEL") {
+    return user.role === "C_LEVEL" || user.id === submission.value.clevel_id;
+  }
+
+  if (status === "PENDING_HRD") {
+    return user.role === "HRD";
+  }
+
+  return false;
 });
 
 const handleApprove = async () => {

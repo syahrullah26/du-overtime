@@ -73,14 +73,13 @@ const filteredSubmissions = computed(() => {
     } else if (activeTab.value === "APPROVAL_HISTORY") {
       if (isOwner) return false;
 
-      if (role === "PIC") {
-        matchTab = item.pic_id === userId && item.status !== "PENDING_PIC";
-      } else if (role === "C_LEVEL") {
-        matchTab =
-          item.clevel_id === userId &&
-          !["PENDING_PIC", "PENDING_C_LEVEL"].includes(item.status);
-      } else if (role === "HRD" || role === "SUPERADMIN") {
+      if (role === "HRD" || role === "SUPERADMIN") {
         matchTab = ["COMPLETED", "REJECTED"].includes(item.status);
+      } else {
+        // For PIC, C_LEVEL, or EMPLOYEE who were assigned as PIC/C-Level
+        const isAssignedPic = item.pic_id === userId && item.status !== "PENDING_PIC";
+        const isAssignedCLevel = item.clevel_id === userId && !["PENDING_PIC", "PENDING_C_LEVEL"].includes(item.status);
+        matchTab = isAssignedPic || isAssignedCLevel;
       }
     }
 
@@ -166,7 +165,6 @@ const filteredSubmissions = computed(() => {
           ></div>
         </button>
         <button
-          v-if="userState?.role !== 'EMPLOYEE'"
           @click="activeTab = 'APPROVAL_HISTORY'"
           :class="[
             'pb-4 text-sm font-bold transition-all relative',

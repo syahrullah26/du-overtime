@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OvertimeSubmission extends Model
 {
-    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -131,17 +129,42 @@ class OvertimeSubmission extends Model
     }
 
     /**
-     * Check if submission can be approved by given role.
+     *pengajuan bisa di approve sama user yg dipilih
      */
-    public function canBeApprovedBy(string $role): bool
+    public function canBeApprovedBy(User $user): bool
     {
-        $allowedTransitions = [
+        $statusMatchRole = [
             self::STATUS_PENDING_PIC => 'PIC',
             self::STATUS_PENDING_C_LEVEL => 'C_LEVEL',
             self::STATUS_PENDING_HRD => 'HRD',
         ];
 
-        return isset($allowedTransitions[$this->status]) && $allowedTransitions[$this->status] === $role;
+        if (!isset($statusMatchRole[$this->status])) {
+            return false;
+        }
+
+        $requiredRole = $statusMatchRole[$this->status];
+
+        // Superadmin can always approve anything that is pendings
+        if ($user->role === 'SUPERADMIN') {
+            return true;
+        }
+
+        // Standard role check
+        if ($user->role === $requiredRole) {
+            return true;
+        }
+
+        // Logic specifically for PIC and C-Level designated by ID
+        if ($this->status === self::STATUS_PENDING_PIC && $this->pic_id === $user->id) {
+            return true;
+        }
+
+        if ($this->status === self::STATUS_PENDING_C_LEVEL && $this->clevel_id === $user->id) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -149,7 +172,7 @@ class OvertimeSubmission extends Model
      */
     public function approve(User $approver, ?string $signaturePath = null): bool
     {
-        if (!$this->canBeApprovedBy($approver->role)) {
+        if (!$this->canBeApprovedBy($approver)) {
             return false;
         }
 
@@ -187,6 +210,10 @@ class OvertimeSubmission extends Model
      */
     public function reject(User $rejector, string $reason): bool
     {
+        if (!$this->canBeApprovedBy($rejector)) {
+            return false;
+        }
+
         $oldStatus = $this->status;
         $this->status = self::STATUS_REJECTED;
         $this->rejection_reason = $reason;
