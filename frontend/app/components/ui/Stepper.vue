@@ -1,17 +1,22 @@
 <script setup lang="ts">
+import statusClass from "~/utils/statusClass";
 defineProps<{
   picStatus: string;
   clevelStatus: string;
   hrdStatus: string;
 }>();
 
-const getStatusClass = (status: string) => {
-  if (status === "done")
-    return "bg-[#C5A059] shadow-[0_0_8px_rgba(197,160,89,0.5)]";
-  if (status === "process")
-    return "bg-amber-200 animate-pulse border-2 border-[#C5A059]";
-  return "bg-gray-200";
-};
+
+const getStatusClass = (computed()=>{
+  return statusClass(status:string)
+})
+// const getStatusClass = (status: string) => {
+//   if (status === "done")
+//     return "bg-[#C5A059] shadow-[0_0_8px_rgba(197,160,89,0.5)]";
+//   if (status === "process")
+//     return "bg-amber-200 animate-pulse border-2 border-[#C5A059]";
+//   return "bg-gray-200";
+// };
 </script>
 <template>
   <div class="flex items-center">

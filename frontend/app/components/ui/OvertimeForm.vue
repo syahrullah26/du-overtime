@@ -68,7 +68,9 @@ const fetchRoles = async () => {
     };
 
     const mapToOption = (users: any[]) =>
-      users.map((u) => ({ label: u.name, value: u.id }));
+      users
+        .filter((u) => u.id !== userState.value?.id)
+        .map((u) => ({ label: u.name, value: u.id }));
 
     picOptions.value = [...mapToOption(pics), otherOption];
     clevelOptions.value = [...mapToOption(clevels), otherOption];

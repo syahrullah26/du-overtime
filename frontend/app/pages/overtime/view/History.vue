@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { getPayrollPeriod, formatCurrency, formatDate } from "~/utils/helper";
+import {
+  getPayrollPeriod,
+  formatCurrency,
+  formatDate,
+  filterHistorySubmissions,
+  getAvailablePeriods,
+} from "~/utils/helper";
 
 const { submissions, fetchSubmissions, loading } = useOvertime();
 const { allDept, fetchAllDept } = useUser();
@@ -17,32 +23,17 @@ onMounted(async () => {
 });
 
 const availablePeriods = computed(() => {
-  if (!submissions.value) return [];
-  const periods = submissions.value.map((s) => getPayrollPeriod(s.created_at));
-  return [...new Set(periods)].sort().reverse();
+  return getAvailablePeriods(submissions.value);
 });
 
 const filteredHistory = computed(() => {
-  if (!submissions.value) return [];
-
-  return submissions.value.filter((item) => {
-    const itemPeriod = getPayrollPeriod(item.created_at);
-    const matchesPeriod = itemPeriod === selectedPeriod.value;
-    const matchesStatus = item.status === "COMPLETED";
-
-    const searchTerm = searchQuery.value.toLowerCase();
-    const matchesSearch = item.employee?.name
-      ?.toLowerCase()
-      .includes(searchTerm);
-
-    const matchesDept =
-      selectedDept.value === "All" ||
-      item.employee?.department?.name === selectedDept.value;
-
-    return matchesPeriod && matchesStatus && matchesSearch && matchesDept;
-  });
+  return filterHistorySubmissions(
+    submissions.value,
+    selectedPeriod.value,
+    selectedDept.value,
+    searchQuery.value,
+  );
 });
-
 const totalRekap = computed(() => {
   return filteredHistory.value.reduce(
     (acc, curr) => acc + (Number(curr.total_pay) || 0),

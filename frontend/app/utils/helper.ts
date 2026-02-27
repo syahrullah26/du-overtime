@@ -1,3 +1,4 @@
+import type { O } from "vue-router/dist/router-CWoNjPRp.mjs";
 import type { OvertimeSubmission } from "~/types/auth";
 // STATUS BADGE ATAU CLASS NYA
 export const statusClass = (status: string) => {
@@ -105,7 +106,86 @@ export const getStepperStatus = (item: OvertimeSubmission, level: string) => {
   }
   return "pending";
 };
+//filter data overtime untuk history
+export const filterHistorySubmissions = (
+  submissions: OvertimeSubmission[],
+  selectedPeriod: string,
+  selectedDept: string,
+  searchQuery: string = "",
+) => {
+  if (!submissions) return [];
 
+  return submissions.filter((item) => {
+    const itemPeriod = getPayrollPeriod(item.created_at);
+    const matchesPeriod = itemPeriod === selectedPeriod;
+    const matchesStatus = item.status === "COMPLETED";
+
+    const searchTerm = searchQuery.toLowerCase();
+    const matchesSearch = item.employee?.name
+      ?.toLowerCase()
+      .includes(searchTerm);
+    const matchesDept =
+      selectedDept.toUpperCase() === "ALL" ||
+      item.employee?.department?.name === selectedDept;
+
+    return matchesPeriod && matchesStatus && matchesSearch && matchesDept;
+  });
+};
+
+//filter data overtime pada halaman index overtime.
+export const filteredDataSubmissions = (
+  submissions: OvertimeSubmission[],
+  userId: string | number | undefined,
+  role: string | undefined,
+  searchTerm: string | "",
+  activeTab: string,
+) => {
+  if (!submissions || !userId) return [];
+  return submissions.filter((item) => {
+    const isOwner = item.employee_id === userId;
+    let matchTab = false;
+    if (activeTab === "PENDING_PIC") {
+      if (isOwner) return false;
+
+      if (item.status === "PENDING_PIC" && item.pic_id === userId)
+        matchTab = true;
+      else if (item.status === "PENDING_C_LEVEL" && item.clevel_id === userId)
+        matchTab = true;
+      else if (item.status === "PENDING_HRD" && role === "HRD") matchTab = true;
+      else if (
+        role === "SUPERADMIN" &&
+        ["PENDING_PIC", "PENDING_C_LEVEL", "PENDING_HRD"].includes(item.status)
+      )
+        matchTab = true;
+    } else if (activeTab === "COMPLETED") {
+      matchTab = isOwner && item.status === "COMPLETED";
+    } else if (activeTab === "REJECTED") {
+      matchTab = isOwner && item.status === "REJECTED";
+    } else if (activeTab === "APPROVAL_HISTORY") {
+      if (isOwner) return false;
+
+      if (role === "HRD" || role === "SUPERADMIN") {
+        matchTab = ["COMPLETED", "REJECTED"].includes(item.status);
+      } else {
+        const isAssignedPic =
+          item.pic_id === userId && item.status !== "PENDING_PIC";
+        const isAssignedCLevel =
+          item.clevel_id === userId &&
+          !["PENDING_PIC", "PENDING_C_LEVEL"].includes(item.status);
+        matchTab = isAssignedPic || isAssignedCLevel;
+      }
+    }
+
+    const employeeName = item.employee?.name?.toLowerCase() || "";
+    const submissionDate = item.date?.toLowerCase() || "";
+    const matchSearch =
+      employeeName.includes(searchTerm) || submissionDate.includes(searchTerm);
+
+    return matchTab && matchSearch;
+  });
+};
+
+//filter data overtime untuk halaman approval
 export const filterPendingApprovals = (
   submissions: OvertimeSubmission[],
   userId: string | number | undefined,
@@ -138,6 +218,12 @@ export const filterPendingApprovals = (
   });
 };
 
+// get availabel periods dari payroll
+export const getAvailablePeriods = (submissions: OvertimeSubmission[]) => {
+  if (!submissions) return [];
+  const periods = submissions.map((s) => getPayrollPeriod(s.created_at));
+  return [...new Set(periods)].sort().reverse();
+};
 // Periode Payroll
 export const getPayrollPeriod = (dateString: string) => {
   const date = new Date(dateString);
@@ -170,12 +256,7 @@ export const getPayrollPeriod = (dateString: string) => {
 
   return `${monthNames[periodMonth]} ${periodYear}`;
 };
-// get totalLembur pada profile
-// utils/helper.ts
-
-/**
- * Menghitung total jam lembur untuk user tertentu dalam periode payroll saat ini
- */
+// get totalLembur per periode pada profile
 export const getTotalHoursByPeriod = (
   submissions: any[],
   targetUserId: number | string | undefined,

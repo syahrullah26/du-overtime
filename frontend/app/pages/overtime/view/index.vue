@@ -4,6 +4,7 @@ import OvertimeTable from "~/components/ui/OvertimeTable.vue";
 import Stepper from "~/components/ui/Stepper.vue";
 import StatsCard from "~/components/ui/StatsCard.vue";
 import type { OvertimeSubmission } from "~/types/auth";
+import { filteredDataSubmissions } from "~/utils/helper";
 const activeTab = ref("PENDING_PIC");
 
 const { userState } = useAuth();
@@ -44,52 +45,13 @@ const stats = computed(() => {
 });
 const searchQuery = ref("");
 const filteredSubmissions = computed(() => {
-  if (!submissions.value) return [];
-
-  const userId = userState.value?.id;
-  const role = userState.value?.role;
-  const searchTerm = searchQuery.value.toLowerCase();
-
-  return submissions.value.filter((item: OvertimeSubmission) => {
-    const isOwner = item.employee_id === userId;
-    let matchTab = false;
-    if (activeTab.value === "PENDING_PIC") {
-      if (isOwner) return false;
-
-      if (item.status === "PENDING_PIC" && item.pic_id === userId)
-        matchTab = true;
-      else if (item.status === "PENDING_C_LEVEL" && item.clevel_id === userId)
-        matchTab = true;
-      else if (item.status === "PENDING_HRD" && role === "HRD") matchTab = true;
-      else if (
-        role === "SUPERADMIN" &&
-        ["PENDING_PIC", "PENDING_C_LEVEL", "PENDING_HRD"].includes(item.status)
-      )
-        matchTab = true;
-    } else if (activeTab.value === "COMPLETED") {
-      matchTab = isOwner && item.status === "COMPLETED";
-    } else if (activeTab.value === "REJECTED") {
-      matchTab = isOwner && item.status === "REJECTED";
-    } else if (activeTab.value === "APPROVAL_HISTORY") {
-      if (isOwner) return false;
-
-      if (role === "HRD" || role === "SUPERADMIN") {
-        matchTab = ["COMPLETED", "REJECTED"].includes(item.status);
-      } else {
-        // For PIC, C_LEVEL, or EMPLOYEE who were assigned as PIC/C-Level
-        const isAssignedPic = item.pic_id === userId && item.status !== "PENDING_PIC";
-        const isAssignedCLevel = item.clevel_id === userId && !["PENDING_PIC", "PENDING_C_LEVEL"].includes(item.status);
-        matchTab = isAssignedPic || isAssignedCLevel;
-      }
-    }
-
-    const employeeName = item.employee?.name?.toLowerCase() || "";
-    const submissionDate = item.date?.toLowerCase() || "";
-    const matchSearch =
-      employeeName.includes(searchTerm) || submissionDate.includes(searchTerm);
-
-    return matchTab && matchSearch;
-  });
+  return filteredDataSubmissions(
+    submissions.value,
+    userState.value?.id,
+    userState.value?.role,
+    searchQuery.value,
+    activeTab.value,
+  );
 });
 </script>
 <template>

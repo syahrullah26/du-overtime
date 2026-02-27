@@ -15,32 +15,15 @@ const profileCompletion = computed(() => {
 const totalLembur = computed(() => {
   return getTotalHoursByPeriod(submissions.value, userState.value?.id);
 });
-
-// const totalLembur = computed(() => {
-//   const userId = userState.value?.id;
-//   if (!userId) return "0.0";
-
-//   const currentPeriod = getPayrollPeriod(new Date().toISOString());
-
-//   const totalHours = submissions.value.reduce((total, item) => {
-//     if (item.employee_id !== userId) return total;
-//     const itemPeriod = getPayrollPeriod(item.created_at);
-//     if (itemPeriod === currentPeriod) {
-//       const start = new Date(item.start_time);
-//       const end = new Date(item.end_time);
-//       const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-//       return total + (hours > 0 ? hours : 0);
-//     }
-
-//     return total;
-//   }, 0);
-
-//   return totalHours.toFixed(1);
-// });
+const periodLembur = computed(() => {
+  const now = new Date();
+  return getPayrollPeriod(now.toISOString());
+});
 
 const stats = computed(() => [
   {
-    label: "Total Lembur",
+    label: "Total Jam Lembur",
+    subLabel: periodLembur.value,
     value: totalLembur.value + "Jam",
     icon: "⏱️",
     color: "bg-blue-50 text-blue-600",
@@ -198,11 +181,19 @@ const handleLogout = async () => {
                   >
                     <span class="text-xl">{{ stat.icon }}</span>
                     <div>
-                      <p
-                        class="text-[10px] font-black text-gray-400 uppercase tracking-tighter"
-                      >
-                        {{ stat.label }}
-                      </p>
+                      <div class="flex flex-col mb-0.5">
+                        <span
+                          class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em] leading-none mb-1"
+                        >
+                          {{ stat.label }}
+                        </span>
+                        <span
+                          v-if="stat.subLabel"
+                          class="text-[11px] font-bold text-amber-600 bg-amber-50 w-fit px-2 py-0.5 rounded-full lowercase tracking-tight"
+                        >
+                          {{ stat.subLabel }}
+                        </span>
+                      </div>
                       <p class="text-sm font-bold text-gray-800">
                         {{ stat.value }}
                       </p>
