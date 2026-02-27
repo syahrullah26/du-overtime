@@ -1,5 +1,5 @@
 import type { O } from "vue-router/dist/router-CWoNjPRp.mjs";
-import type { OvertimeSubmission } from "~/types/auth";
+import type { OvertimeSubmission, User } from "~/types/auth";
 // STATUS BADGE ATAU CLASS NYA
 export const statusClass = (status: string) => {
   const base = "px-2 py-1 rounded-md text-xs font-bold ";
@@ -215,6 +215,27 @@ export const filterPendingApprovals = (
     }
 
     return false;
+  });
+};
+//filter data User pada page admin user
+export const getfilteredUsers = (
+  allUser: User[],
+  selectedDept: string,
+  searchQuery: string = "",
+) => {
+  if (!allUser) return [];
+
+  return allUser.filter((user) => {
+    const exceptionsUser = user.role !== "SUPERADMIN";
+
+    const matchesDept =
+      selectedDept.toUpperCase() === "ALL" ||
+      selectedDept === user.department?.name;
+
+    const searchTerm = searchQuery.toLowerCase();
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm);
+
+    return exceptionsUser && matchesDept && matchesSearch;
   });
 };
 

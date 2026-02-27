@@ -18,6 +18,8 @@ export const useUser = () => {
         "Error Fetching All Users Data:",
         error.data | error.message,
       );
+    } finally {
+      loading.value = false;
     }
     return [];
   };

@@ -106,12 +106,6 @@ const stats = computed(() => {
   ];
 });
 
-// console.log(
-//   "data Pending dan Process :",
-//   pendingCount.value,
-//   totalProcess.value,
-// );
-
 onMounted(async () => {
   await fetchSubmissions();
 });
