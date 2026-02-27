@@ -89,6 +89,23 @@ export const completionClass = (percentage: number) => {
   return "bg-[var(--gold-main)] text-black shadow-[var(--gold-main)] shadow-sm";
 };
 
+// Menentukan badge status overtime
+export const getStepperStatus = (item: OvertimeSubmission, level: string) => {
+  const status = item.status;
+  if (status === "COMPLETED") return "done";
+  if (status === "REJECTED") return "error";
+
+  if (level === "PIC") return status === "PENDING_PIC" ? "process" : "done";
+  if (level === "CLEVEL") {
+    if (status === "PENDING_PIC") return "pending";
+    return status === "PENDING_C_LEVEL" ? "process" : "done";
+  }
+  if (level === "HRD") {
+    return status === "PENDING_HRD" ? "process" : "pending";
+  }
+  return "pending";
+};
+
 export const filterPendingApprovals = (
   submissions: OvertimeSubmission[],
   userId: string | number | undefined,

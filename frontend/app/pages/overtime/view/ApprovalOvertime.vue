@@ -4,7 +4,12 @@ import type { OvertimeSubmission } from "~/types/auth";
 import StatsCard from "~/components/ui/StatsCard.vue";
 import Stepper from "~/components/ui/Stepper.vue";
 import OvertimeTable from "~/components/ui/OvertimeTable.vue";
-import { formatCurrency, formatDate, formatTime } from "~/utils/helper";
+import {
+  formatCurrency,
+  formatDate,
+  formatTime,
+  getStepperStatus,
+} from "~/utils/helper";
 
 const { userState } = useAuth();
 const {
@@ -107,25 +112,6 @@ const stats = computed(() => {
 //   totalProcess.value,
 // );
 
-const getStepperStatus = (
-  item: OvertimeSubmission,
-  level: "PIC" | "CLEVEL" | "HRD",
-) => {
-  const status = item.status;
-  if (status === "COMPLETED") return "done";
-  if (status === "REJECTED") return "error";
-
-  if (level === "PIC") return status === "PENDING_PIC" ? "process" : "done";
-  if (level === "CLEVEL") {
-    if (status === "PENDING_PIC") return "pending";
-    return status === "PENDING_C_LEVEL" ? "process" : "done";
-  }
-  if (level === "HRD") {
-    return status === "PENDING_HRD" ? "process" : "pending";
-  }
-  return "pending";
-};
-
 onMounted(async () => {
   await fetchSubmissions();
 });
@@ -211,9 +197,15 @@ onMounted(async () => {
             <td class="p-6">
               <div class="flex items-center gap-3">
                 <div
-                  class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold"
+                  class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold"
                 >
-                  {{ item.employee?.name?.charAt(0) }}
+                  <img
+                    :src="
+                      getImageUrl(item.employee?.profile_picture) ||
+                      `https://ui-avatars.com/api/?name=${item.employee?.name}&background=111&color=fff&size=200`
+                    "
+                    class="rounded-full"
+                  />
                 </div>
                 <span class="text-sm font-bold text-gray-700">{{
                   item.employee?.name || "Unknown"

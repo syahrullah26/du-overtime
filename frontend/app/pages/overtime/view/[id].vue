@@ -76,25 +76,7 @@ const fetchDetail = async () => {
 
 console.log(submission);
 
-const getStepperStatus = (
-  item: OvertimeSubmission,
-  level: "PIC" | "CLEVEL" | "HRD",
-) => {
-  const status = item.status;
-  if (status === "COMPLETED") return "done";
-  if (status === "REJECTED") return "error";
 
-  if (level === "PIC") return status === "PENDING_PIC" ? "process" : "done";
-  if (level === "CLEVEL") {
-    if (status === "PENDING_PIC") return "pending";
-    return status === "PENDING_C_LEVEL" ? "process" : "done";
-  }
-  if (level === "HRD") {
-    if (status === "PENDING_HRD") return "process";
-    return "pending";
-  }
-  return "pending";
-};
 onMounted(fetchDetail);
 
 const stats = computed(() => {
