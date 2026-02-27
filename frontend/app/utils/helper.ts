@@ -89,7 +89,7 @@ export const completionClass = (percentage: number) => {
   return "bg-[var(--gold-main)] text-black shadow-[var(--gold-main)] shadow-sm";
 };
 
-// Menentukan badge status overtime
+// Menentukan badge status overtime pada component stepper
 export const getStepperStatus = (item: OvertimeSubmission, level: string) => {
   const status = item.status;
   if (status === "COMPLETED") return "done";
@@ -169,4 +169,17 @@ export const getPayrollPeriod = (dateString: string) => {
   ];
 
   return `${monthNames[periodMonth]} ${periodYear}`;
+};
+
+export const getActionColor = (action: string) => {
+  switch (action) {
+    case "SUBMIT":
+      return "text-blue-600 bg-blue-50";
+    case "APPROVE":
+      return "text-green-600 bg-green-50";
+    case "REJECT":
+      return "text-red-600 bg-red-50";
+    default:
+      return "text-gray-600 bg-gray-50";
+  }
 };
