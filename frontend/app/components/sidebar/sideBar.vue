@@ -80,7 +80,7 @@ const menus: Menu[] = [
         role: ["SUPERADMIN", "HRD"],
         children: [
           { name: "Employee List", to: "/admin/user", icon: "📋" },
-          { name: "Add Employee", to: "/admin/user/add", icon: "➕" },
+          { name: "Add Employee", to: "/admin/user/register", icon: "➕" },
         ],
       },
       {

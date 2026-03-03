@@ -1,6 +1,7 @@
 import type {
   ChangePasswordPayload,
   EditProfilePayload,
+  RegisterPayload,
 } from "~/types/payload";
 import type { Department } from "~/types/auth";
 export const useUser = () => {
@@ -132,6 +133,21 @@ export const useUser = () => {
     }
   };
 
+  const registerUser = async (payload: RegisterPayload) => {
+    loading.value = true;
+    try {
+      const response = await useApiFetch<any>(`/register`, {
+        method: "POST",
+        body: payload,
+      });
+      return response.data || response;
+    } catch (error: any) {
+      console.error("Error registering user:", error.data || error.message);
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const fetchAllDept = async () => {
     try {
       loading.value = true;
@@ -156,6 +172,7 @@ export const useUser = () => {
     updateUser,
     uploadProfilePicture,
     uploadSignature,
+    registerUser,
     fetchAllDept,
     userSelected,
     loading,

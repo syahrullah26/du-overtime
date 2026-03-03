@@ -13,4 +13,14 @@ export interface EditProfilePayload {
   avatar?: File | string | null;
   profile_picture?: File | string | null;
   signature?: File | string | null;
+  dept_id?: number;
+}
+
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+  role: string;
+  dept_id: number;
 }

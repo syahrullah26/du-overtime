@@ -47,6 +47,7 @@ const getImageUrl = (path: string | null) => {
 const { userState, fetchUser } = useAuth();
 const { uploadProfilePicture, uploadSignature } = useUser();
 
+
 const isFile = (val: any): val is File => {
   return typeof window !== "undefined" && val instanceof File;
 };

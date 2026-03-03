@@ -173,7 +173,30 @@ const handleDelete = (id: number) => {
 
               <td class="p-5">
                 <div class="flex justify-end items-center gap-2.5">
+                  <NuxtLink :to="`/admin/user/${user.id}`">
+                    <button
+                      class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-[var(--gold-dark)]"
+                    >
+                      🔍
+                    </button>
+                  </NuxtLink>
+
                   <NuxtLink
+                    :to="`/admin/user/${user.id}/edit`"
+                    title="Edit User"
+                    class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-amber-500"
+                  >
+                    <span class="text-sm">📝</span>
+                  </NuxtLink>
+
+                  <button
+                    @click="handleDelete(user.id)"
+                    title="Delete User"
+                    class="cursor-pointer hover:bg-[var(--white-bone)] rounded-xl transition-all shadow-lg shadow-gray-600 p-2 hover:scale-110 transition-all hover:shadow-red-500"
+                  >
+                    <span class="text-sm">🗑️</span>
+                  </button>
+                  <!-- <NuxtLink
                     :to="`/admin/user/${user.id}`"
                     title="View Details"
                     class="flex items-center justify-center w-10 h-10 bg-white text-blue-500 hover:bg-blue-500 hover:text-white border border-gray-100 hover:border-blue-500 shadow-sm hover:shadow-blue-200 rounded-xl transition-all duration-300"
@@ -195,7 +218,7 @@ const handleDelete = (id: number) => {
                     class="flex items-center justify-center w-10 h-10 bg-white text-red-500 hover:bg-red-500 hover:text-white border border-gray-100 hover:border-red-500 shadow-sm hover:shadow-red-200 rounded-xl transition-all duration-300"
                   >
                     <span class="text-sm">🗑️</span>
-                  </button>
+                  </button> -->
                 </div>
               </td>
             </tr>
