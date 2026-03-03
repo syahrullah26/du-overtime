@@ -89,7 +89,11 @@ const menus: Menu[] = [
         role: ["SUPERADMIN", "HRD"],
         children: [
           { name: "Department List", to: "/admin/department", icon: "📋" },
-          { name: "Add Department", to: "/admin/department/add", icon: "➕" },
+          {
+            name: "Add Department",
+            to: "/admin/department/add",
+            icon: "➕",
+          },
         ],
       },
     ],
@@ -133,13 +137,30 @@ const isActive = (path: string | undefined) =>
 
 <template>
   <div
+    class="lg:hidden fixed top-0 left-0 right-0 h-16 bg-zinc-900 border-b border-zinc-800 flex items-center px-4 z-30"
+  >
+    <button
+      @click="isOpen = true"
+      class="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+    >
+      <span class="text-2xl">☰</span>
+    </button>
+    <div class="ml-4 flex items-center gap-2">
+      <img src="/du-universal.png" alt="Logo" class="h-6 object-contain" />
+      <span class="text-xs font-black text-white uppercase tracking-tighter"
+        >Dewa Overtime</span
+      >
+    </div>
+  </div>
+
+  <div
     v-if="isOpen"
     @click="isOpen = false"
-    class="fixed inset-0 bg-black/60 z-30 lg:hidden"
+    class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[45] lg:hidden transition-opacity"
   />
 
   <aside
-    class="fixed top-0 left-0 h-screen z-40 bg-zinc-900 border-r border-zinc-800 flex flex-col transition-all duration-300"
+    class="fixed top-0 left-0 h-screen z-[50] bg-zinc-900 border-r border-zinc-800 flex flex-col transition-all duration-300 ease-in-out"
     :class="[
       isCollapsed ? 'w-20' : 'w-64',
       isOpen ? 'translate-x-0' : '-translate-x-full',
@@ -147,9 +168,9 @@ const isActive = (path: string | undefined) =>
     ]"
   >
     <div
-      class="h-16 flex items-center justify-between px-4 border-b border-zinc-800"
+      class="h-16 flex items-center justify-between px-4 border-b border-zinc-800 shrink-0"
     >
-      <div v-if="!isCollapsed" class="flex items-center gap-2">
+      <div v-if="!isCollapsed || isOpen" class="flex items-center gap-2">
         <img src="/du-universal.png" alt="Logo" class="h-8 object-contain" />
         <h1 class="text-sm font-bold text-white uppercase tracking-tighter">
           <span class="text-yellow-600">Dewa</span> Overtime
@@ -160,10 +181,13 @@ const isActive = (path: string | undefined) =>
       </div>
 
       <button
-        @click="isSidebarOpen = !isSidebarOpen"
-        class="hidden lg:flex text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-zinc-800 transition-colors"
+        @click="isOpen ? (isOpen = false) : (isSidebarOpen = !isSidebarOpen)"
+        class="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-zinc-800 transition-colors"
       >
-        {{ isSidebarOpen ? "❮" : "☰" }}
+        <span v-if="isOpen" class="lg:hidden">✕</span>
+        <span v-else class="hidden lg:block">{{
+          isSidebarOpen ? "❮" : "☰"
+        }}</span>
       </button>
     </div>
 
@@ -175,15 +199,15 @@ const isActive = (path: string | undefined) =>
           @click="isOpen = false"
           class="group flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 transition-all duration-200"
           :class="
-            isActive(menu.to).value
-              ? 'bg-yellow-600 text-white shadow-lg shadow-yellow-900/20'
+            isActive(menu.to)
+              ? 'bg-zinc-800 text-white shadow-lg shadow-zinc-900/20'
               : 'hover:bg-zinc-800'
           "
         >
           <span class="text-xl transition-transform group-hover:scale-110">{{
             menu.icon
           }}</span>
-          <span v-if="!isCollapsed" class="font-medium text-sm">{{
+          <span v-if="!isCollapsed || isOpen" class="font-medium text-sm">{{
             menu.name
           }}</span>
         </NuxtLink>
@@ -196,12 +220,12 @@ const isActive = (path: string | undefined) =>
           >
             <div class="flex items-center gap-3">
               <span class="text-xl">{{ menu.icon }}</span>
-              <span v-if="!isCollapsed" class="font-medium text-sm">{{
+              <span v-if="!isCollapsed || isOpen" class="font-medium text-sm">{{
                 menu.name
               }}</span>
             </div>
             <span
-              v-if="!isCollapsed"
+              v-if="!isCollapsed || isOpen"
               class="text-[10px] transition-transform duration-300"
               :class="openMenu === menu.name ? 'rotate-180' : ''"
               >▼</span
@@ -209,16 +233,17 @@ const isActive = (path: string | undefined) =>
           </button>
 
           <div
-            v-if="openMenu === menu.name && !isCollapsed"
-            class="ml-4 mt-1 space-y-1 border-l border-zinc-800 pl-2 transition-all"
+            v-if="openMenu === menu.name && (!isCollapsed || isOpen)"
+            class="ml-4 mt-1 space-y-1 border-l border-zinc-800 pl-2"
           >
             <template v-for="child in menu.children" :key="child.name">
               <NuxtLink
                 v-if="!child.children || child.children.length === 0"
                 :to="child.to"
+                @click="isOpen = false"
                 class="block px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-zinc-800 transition-all"
                 :class="
-                  isActive(child.to).value
+                  isActive(child.to)
                     ? 'text-yellow-500 font-bold bg-zinc-800'
                     : ''
                 "
@@ -232,16 +257,16 @@ const isActive = (path: string | undefined) =>
                 >
                   <span>{{ child.icon }}</span> {{ child.name }}
                 </div>
-
                 <div class="ml-4 space-y-1 border-l border-zinc-800/50 pl-2">
                   <NuxtLink
                     v-for="grandChild in child.children"
                     :key="grandChild.name"
                     :to="grandChild.to"
+                    @click="isOpen = false"
                     class="block px-4 py-1.5 rounded-lg text-xs text-gray-500 hover:text-white hover:bg-zinc-800 transition-all"
                     :class="
-                      isActive(grandChild.to).value
-                        ? 'text-yellow-500 font-bold'
+                      isActive(grandChild.to)
+                        ? 'text-[var(--gold-dark)] font-bold'
                         : ''
                     "
                   >
@@ -256,10 +281,11 @@ const isActive = (path: string | undefined) =>
       </template>
     </nav>
 
-    <div class="p-4 border-t border-zinc-800 bg-zinc-900/50">
+    <div class="p-4 border-t border-zinc-800 bg-zinc-900/50 shrink-0">
       <div v-if="userState" class="mb-4">
         <NuxtLink
           to="/profile"
+          @click="isOpen = false"
           class="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-800 transition-all"
         >
           <img
@@ -270,7 +296,7 @@ const isActive = (path: string | undefined) =>
             class="w-10 h-10 rounded-full object-cover border border-zinc-700"
           />
           <div
-            v-if="!isCollapsed"
+            v-if="!isCollapsed || isOpen"
             class="flex flex-col overflow-hidden text-left"
           >
             <span class="text-xs font-bold text-white truncate">{{
@@ -288,10 +314,12 @@ const isActive = (path: string | undefined) =>
         class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-red-400 bg-red-500/5 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all active:scale-95"
       >
         <span>🚪</span>
-        <span v-if="!isCollapsed">Sign Out</span>
+        <span v-if="!isCollapsed || isOpen">Sign Out</span>
       </button>
     </div>
   </aside>
+
+  <div class="lg:hidden h-16 w-full"></div>
 </template>
 
 <style scoped>

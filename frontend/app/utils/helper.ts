@@ -1,5 +1,5 @@
 import type { O } from "vue-router/dist/router-CWoNjPRp.mjs";
-import type { OvertimeSubmission, User } from "~/types/auth";
+import type { Department, OvertimeSubmission, User } from "~/types/auth";
 // STATUS BADGE ATAU CLASS NYA
 export const statusClass = (status: string) => {
   const base = "px-2 py-1 rounded-md text-xs font-bold ";
@@ -236,6 +236,21 @@ export const getfilteredUsers = (
     const matchesSearch = user.name.toLowerCase().includes(searchTerm);
 
     return exceptionsUser && matchesDept && matchesSearch;
+  });
+};
+
+// Filter Data Department pada page admin department
+export const getFilteredDepartment = (
+  allDepartment: Department[],
+  searchQuery: string = "",
+) => {
+  if (!allDepartment) return [];
+
+  return allDepartment.filter((department) => {
+    const searchTerm = searchQuery.toLowerCase();
+    const matchSearch = department.name.toLowerCase().includes(searchTerm);
+
+    return matchSearch;
   });
 };
 

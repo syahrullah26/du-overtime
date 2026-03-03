@@ -6,6 +6,8 @@ const { fetchAllUsers, allDept, fetchAllDept } = useUser();
 const allUser = ref<any[]>([]);
 const searchQuery = ref("");
 const selectedDept = ref("All");
+const loading = ref(false);
+const errorMessage = ref("");
 
 onMounted(() => {
   (fetchAllUsers().then((response) => {
@@ -18,8 +20,25 @@ const filteredUser = computed(() => {
   return getfilteredUsers(allUser.value, selectedDept.value, searchQuery.value);
 });
 
-const handleDelete = (id: number) => {
-  return console.log("delete User With ID:", id);
+const handleDelete = async (id: number) => {
+  if (!confirm("Apakah Anda yakin ingin menghapus karyawan ini?")) return;
+
+  try {
+    loading.value = true;
+    errorMessage.value = "";
+    await useApiFetch<any>(`/users/${id}`, {
+      method: "DELETE",
+    });
+    errorMessage.value = "Deleted Successfully!";
+    if (allUser.value) {
+      allUser.value = allUser.value.filter((u: any) => u.id !== id);
+      allUser.value;
+    }
+  } catch (error: any) {
+    console.error("Error deleting user:", error.data || error.message);
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 <template>
@@ -45,8 +64,61 @@ const handleDelete = (id: number) => {
           >
         </h1>
       </div>
+      <div
+        class="bg-white px-6 py-3 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4"
+      >
+        <div class="text-right">
+          <p
+            class="text-[10px] font-black text-gray-400 uppercase tracking-widest"
+          >
+            Total Employee
+          </p>
+          <p class="text-2xl font-black text-zinc-900 leading-none">
+            {{ filteredUser.length }}
+          </p>
+        </div>
+        <div
+          class="w-10 h-10 bg-zinc-50 rounded-xl flex items-center justify-center text-xl"
+        >
+          👨‍💼
+        </div>
+      </div>
     </header>
+    <Transition name="error-pop">
+      <div v-if="errorMessage" class="w-full max-w-2xl mt-6 group">
+        <div
+          class="relative overflow-hidden bg-red-500/5 backdrop-blur-sm border border-red-500/20 rounded-2xl p-4 flex items-center gap-4 transition-all duration-500 hover:bg-red-500/10"
+        >
+          <div
+            class="flex-shrink-0 w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center animate-pulse"
+          >
+            <span class="text-red-600 text-lg">⚠️</span>
+          </div>
 
+          <div class="flex-1 flex flex-col">
+            <div class="flex items-center justify-between">
+              <span
+                class="text-[9px] font-black text-red-600 uppercase tracking-[0.3em]"
+                >System Alert</span
+              >
+              <button
+                @click="errorMessage = ''"
+                class="text-red-400 hover:text-red-600 transition-colors text-xs font-black uppercase tracking-tighter"
+              >
+                Dismiss
+              </button>
+            </div>
+            <p class="text-xs font-bold text-zinc-900 leading-relaxed mt-0.5">
+              {{ errorMessage }}
+            </p>
+          </div>
+
+          <div
+            class="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-[var(--gold-dark)] to-transparent opacity-50"
+          ></div>
+        </div>
+      </div>
+    </Transition>
     <div
       class="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 mb-6 flex flex-col lg:flex-row gap-4"
     >
@@ -150,16 +222,39 @@ const handleDelete = (id: number) => {
               </td>
 
               <td class="p-5 whitespace-nowrap">
-                <span
-                  class="inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest"
-                  :class="
-                    user.department
-                      ? 'bg-amber-50 text-amber-700 border border-amber-100'
-                      : 'bg-slate-50 text-slate-600 border border-slate-100'
-                  "
-                >
-                  {{ user.department?.name || user.role || "General" }}
-                </span>
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center">
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider border"
+                      :class="
+                        user.department
+                          ? 'bg-blue-50 text-blue-700 border-blue-100'
+                          : 'bg-gray-50 text-gray-500 border-gray-100'
+                      "
+                    >
+                      <span
+                        class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-1.5"
+                      ></span>
+                      {{ user.department?.name || "No Department" }}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center">
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider border"
+                      :class="
+                        user.role
+                          ? 'bg-amber-50 text-amber-700 border-amber-100'
+                          : 'bg-slate-50 text-slate-500 border-slate-100'
+                      "
+                    >
+                      <span
+                        class="w-1.5 h-1.5 rounded-full bg-amber-400 mr-1.5"
+                      ></span>
+                      {{ user.role || "Employee" }}
+                    </span>
+                  </div>
+                </div>
               </td>
 
               <td class="p-5 whitespace-nowrap">
